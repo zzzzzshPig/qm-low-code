@@ -46,6 +46,7 @@
       "@vue/typescript/recommended"
     ],
     "parserOptions": {
+      "parse": "@typescript/parser",
       "ecmaVersion": 2020
     },
     "rules": {}
