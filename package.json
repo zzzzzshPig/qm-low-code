@@ -43,13 +43,20 @@
     "extends": [
       "plugin:vue/vue3-essential",
       "@vue/standard",
+      "plugin:vue/vue3-recommended",
       "@vue/typescript/recommended"
     ],
     "parserOptions": {
       "parse": "@typescript/parser",
       "ecmaVersion": 2020
     },
-    "rules": {}
+    "rules": {
+      "indent": ["error", 4],
+      "vue/html-indent": ["error", 4],
+      "vue/component-tags-order": ["error", {
+        "order": ["template", "style", "script"]
+      }]
+    }
   },
   "browserslist": [
     "> 1%",
