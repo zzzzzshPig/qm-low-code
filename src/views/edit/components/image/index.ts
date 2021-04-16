@@ -1,8 +1,17 @@
-import { defineComponent } from 'vue'
+import { defineComponent, reactive } from 'vue'
 import { baseProps } from '@/views/edit/components/helper'
+import { MyParams } from '@/views/edit/components/type'
+
+const params: MyParams = reactive({
+    ...baseProps()
+})
 
 export default defineComponent({
-    props: {
-        ...baseProps
+    params,
+
+    setup () {
+        return {
+            params
+        }
     }
 })
