@@ -7,6 +7,7 @@ function renderComponent (component: DefineComponent) {
     const container = document.createElement('div')
     container.className = `_container_class_${classId}`
 
+    // need renderId
     return createApp({
         render () {
             return h(component)
@@ -14,20 +15,10 @@ function renderComponent (component: DefineComponent) {
     }).mount(container)
 }
 
-const components = [Image]
-function loadComponent () {
-    return components.map(a => {
-        return {
-            ...a,
-            params: a.params
-        }
-    })
-}
+const componentList = [Image]
 
 export default defineComponent({
     setup () {
-        const componentList = loadComponent()
-
         console.log(componentList)
         return {
             componentList

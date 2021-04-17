@@ -1,9 +1,18 @@
-import vue from './index.vue'
-import image from './image.svg'
 import { MyParams } from '../type'
+import { ComponentType } from '../const'
+import { reactive } from 'vue'
+import { baseProps, getExportConfig } from '@/views/edit/components/helper'
+import image from './image.svg'
+import component from './index.vue'
 
-export default {
+export const imageParams: MyParams = reactive({
+    ...baseProps()
+})
+
+export default getExportConfig({
+    componentId: ComponentType.Image,
+    label: '图片',
     image,
-    vue,
-    params: vue.params as MyParams
-}
+    component,
+    params: imageParams
+})

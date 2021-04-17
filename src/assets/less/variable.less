@@ -1,0 +1,149 @@
+.mask() {
+  overflow-y: auto;
+  z-index: 99;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, .5);
+
+  .content {
+    position: absolute;
+    top: 150px;
+    left: 50%;
+    background: rgba(255, 255, 255, 1);
+    box-sizing: border-box;
+    transform: translateX(-50%);
+    border-radius: 4px;
+  }
+}
+
+.flex-column() {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-justify-between() {
+  display: flex;
+  justify-content: space-between;
+}
+
+.flex-align-stretch() {
+  display: flex;
+  align-items: stretch;
+}
+
+.flex-align-center() {
+  display: flex;
+  align-items: center;
+}
+
+.flex-align-center-wrap {
+  .flex-align-center;
+  flex-wrap: wrap;
+}
+
+.flex-justify-center() {
+  display: flex;
+  justify-content: center;
+}
+
+.flex-justify-start() {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.flex-align-start() {
+  display: flex;
+  align-items: flex-start;
+}
+
+.flex-align-start-wrap {
+  .flex-align-start;
+  flex-wrap: wrap;
+}
+
+.flex-align-center-column() {
+  .flex-align-center;
+  flex-direction: column;
+}
+
+.flex-align-center-justify-end() {
+  .flex-align-center;
+  justify-content: flex-end;
+}
+
+.flex-align-center-justify-center() {
+  .flex-align-center;
+  justify-content: center;
+}
+
+.flex-align-center-justify-center-column() {
+  .flex-align-center-justify-center;
+  flex-direction: column;
+}
+
+.flex-align-center-justify-Between() {
+  .flex-align-center;
+  justify-content: space-between;
+}
+
+.flex-align-start-justify-Between() {
+  .flex-align-start;
+  justify-content: space-between;
+}
+
+.flex-align-center-justify-around() {
+  .flex-align-center;
+  justify-content: space-around;
+}
+
+.relative() {
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+// 字号
+.defaultText(@size: 14px, @color: rgba(0,0,0,.85), @lineHeight: 22px, @weight: 400) {
+  line-height: @lineHeight;
+  font-weight: @weight;
+  font-size: @size;
+  color: @color;
+}
+
+// 文字超出隐藏
+.textOverFlow(@type: ellipsis) {
+  overflow: hidden;
+  text-overflow: @type;
+  white-space: nowrap;
+}
+
+// 扩大点击范围
+.addClickArea(@width: 4px, @height: 4px) {
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: calc(100% + @width * 2);
+    height: calc(100% + @height * 2);
+    margin-left: -@width;
+    margin-top: -@height;
+  }
+}
+
+.btn-type-success () {
+  background: #67c23a;
+  border-color: transparent;
+  color: #fff;
+  box-shadow: none;
+
+  &:hover {
+    background: rgba(103, 194, 58, .8);
+  }
+
+  &:disabled {
+    opacity: .3;
+  }
+}

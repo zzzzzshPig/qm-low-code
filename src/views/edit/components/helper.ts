@@ -1,6 +1,28 @@
+import { ComponentType } from '@/views/edit/components/const'
+import type { DefineComponent } from 'vue'
+import { MyParams } from '@/views/edit/components/type'
+
 export enum QueryType {
     string,
     number
+}
+
+type ExportConfig = {
+    componentId: ComponentType
+    // eslint-disable-next-line
+    component: DefineComponent<{}, {}, any>
+    image: string
+    label: string
+    params: MyParams
+}
+export function getExportConfig ({ componentId, component, image, params, label }: ExportConfig) {
+    return {
+        componentId,
+        component,
+        image,
+        label,
+        params
+    }
 }
 
 export function numberProp (label = '', value = 0) {
