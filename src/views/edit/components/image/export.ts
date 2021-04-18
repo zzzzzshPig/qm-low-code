@@ -1,11 +1,10 @@
-import { MyParams } from '../type'
 import { ComponentType } from '../const'
 import { reactive } from 'vue'
 import { baseProps, getExportConfig } from '@/views/edit/components/helper'
 import image from './image.svg'
 import component from './index.vue'
 
-export const imageParams: MyParams = reactive({
+export const imageParams = reactive({
     ...baseProps()
 })
 

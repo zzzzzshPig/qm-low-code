@@ -1,21 +1,19 @@
 import { ComponentType } from '@/views/edit/components/const'
-import type { DefineComponent } from 'vue'
-import { MyParams } from '@/views/edit/components/type'
+import { MyParams, VueComponent } from '@/views/edit/components/type'
 
-export enum QueryType {
+export enum ParamType {
     string,
     number
 }
 
-type ExportConfig = {
+export type ExportConfig<T extends MyParams> = {
     componentId: ComponentType
-    // eslint-disable-next-line
-    component: DefineComponent<{}, {}, any>
+    component: VueComponent
     image: string
     label: string
-    params: MyParams
+    params: T
 }
-export function getExportConfig ({ componentId, component, image, params, label }: ExportConfig) {
+export function getExportConfig<T extends MyParams> ({ componentId, component, image, params, label }: ExportConfig<T>) {
     return {
         componentId,
         component,
@@ -27,7 +25,7 @@ export function getExportConfig ({ componentId, component, image, params, label 
 
 export function numberProp (label = '', value = 0) {
     return {
-        type: QueryType.number,
+        type: ParamType.number,
         label,
         value
     }
@@ -35,7 +33,7 @@ export function numberProp (label = '', value = 0) {
 
 export function stringProp (label = '', value = '') {
     return {
-        type: QueryType.string,
+        type: ParamType.string,
         label,
         value
     }

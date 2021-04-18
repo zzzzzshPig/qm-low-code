@@ -4,6 +4,7 @@
             v-for="item in componentList"
             :key="item.componentId"
             class="item"
+            @click="renderComponent(item)"
         >
             <img
                 :src="item.image"
@@ -15,20 +16,60 @@
             </div>
         </div>
     </div>
+
+    <div class="canvas" />
+
+    <div class="prop-list">
+        <div
+            v-for="(item, key) in propList"
+            :key="key"
+            class="item"
+        >
+            <div class="label">
+                {{ item.label }}：
+            </div>
+
+            <a-input
+                v-if="item.type === paramType.string"
+                v-model:value="item.value"
+                class="input"
+                type="text"
+            />
+
+            <a-input-number
+                v-if="item.type === paramType.number"
+                v-model:value="item.value"
+                class="input"
+            />
+        </div>
+    </div>
 </template>
 
 <style scoped lang="less">
+    .canvas {
+        position: absolute;
+        top: 80px;
+        left: 50%;
+        width: 375px;
+        height: 667px;
+        border: 1px solid rgba(0, 0, 0, .1);
+        transform: translateX(-50%);
+    }
+
     .component-list {
         .flex-align-start-wrap;
-        width: 300px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 228px;
         height: 100%;
         padding: 16px;
         border-right: 1px solid rgba(0, 0, 0, .1);
 
         .item {
             .flex-align-center-justify-center-column;
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 90px;
             border: 1px solid rgba(0, 0, 0, .1);
             cursor: pointer;
             user-select: none;
@@ -37,6 +78,33 @@
             .image {
                 width: 48px;
                 height: 48px;
+            }
+        }
+    }
+
+    .prop-list {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 100%;
+        padding: 16px;
+        border-left: 1px solid rgba(0, 0, 0, .1);
+
+        .item {
+            .flex-align-start;
+            padding: 8px 0;
+
+            .label {
+                flex-shrink: 0;
+                width: 90px;
+                margin: 5px 8px 0 0;
+                word-break: break-all;
+            }
+
+            .input {
+                flex: 1;
+                height: 32px;
             }
         }
     }

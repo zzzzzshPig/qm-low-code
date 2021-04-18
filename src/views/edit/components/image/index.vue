@@ -1,5 +1,11 @@
 <template>
-    我是Image组件
+    {{ x.value }}
+
+    {{ y.value }}
+
+    {{ width.value }}
+
+    {{ height.value }}
 </template>
 
 <style lang="less" scoped>

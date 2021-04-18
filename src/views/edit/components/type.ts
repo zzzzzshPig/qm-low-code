@@ -1,9 +1,13 @@
-import { QueryType } from '@/views/edit/components/helper'
+import { ParamType } from '@/views/edit/components/helper'
+import { DefineComponent } from 'vue'
 
 export type MyParams = {
-    [key: string]: {
+    [k: string]: {
         label: string
-        type: QueryType,
+        type: ParamType,
         value: string | number | boolean
     }
 }
+
+// eslint-disable-next-line
+export type VueComponent = DefineComponent<{}, {}, any>
