@@ -2,7 +2,7 @@ import { ParamType } from '@/views/edit/components/helper'
 import { DefineComponent } from 'vue'
 
 export type MyParams = {
-    [k: string]: {
+    [index: string]: {
         label: string
         type: ParamType,
         value: string | number | boolean
@@ -10,4 +10,4 @@ export type MyParams = {
 }
 
 // eslint-disable-next-line
-export type VueComponent = DefineComponent<{}, {}, any>
+export type VueComponent = any

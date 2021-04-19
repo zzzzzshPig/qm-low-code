@@ -47,6 +47,7 @@
 
 <style scoped lang="less">
     .canvas {
+        overflow: hidden;
         position: absolute;
         top: 80px;
         left: 50%;

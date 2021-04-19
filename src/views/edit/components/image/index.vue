@@ -1,11 +1,9 @@
 <template>
-    {{ x.value }}
-
-    {{ y.value }}
-
-    {{ width.value }}
-
-    {{ height.value }}
+    <img
+        ref="root"
+        :src="src.value"
+        alt=""
+    >
 </template>
 
 <style lang="less" scoped>
