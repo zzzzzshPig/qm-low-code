@@ -36,10 +36,11 @@
                 type="text"
             />
 
-            <a-input-number
+            <a-input
                 v-if="item.type === paramType.number"
                 v-model:value="item.value"
                 class="input"
+                type="number"
             />
         </div>
     </div>

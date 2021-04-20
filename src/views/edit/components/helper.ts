@@ -2,66 +2,50 @@ import { ComponentType } from '@/views/edit/components/const'
 import { MyParams } from '@/views/edit/components/type'
 import { Ref, watch, watchEffect } from 'vue'
 
-type MyPropType<T> = {
-    [K in keyof T]: {
-        type: ObjectConstructor,
-        default: T[K]
-    }
-}
-
 export enum ParamType {
     string,
     number
 }
 
-export function compilerParamsToProps<T extends MyParams> (params: T) {
-    const res: MyPropType<T> = {} as never
-
-    const keys = Reflect.ownKeys(params) as string[]
-
-    keys.forEach((a: keyof T) => {
-        const param = params[a]
-
-        res[a] = {
-            type: Object,
-            default: param
-        }
-    })
-
-    return res
-}
-
-export type ExportConfig<T extends MyParams> = {
+export type ExportConfig = {
     componentId: ComponentType // 组件Id，用于从数据中生成组件
     // eslint-disable-next-line
-    component: Promise<{ default: any }> // 被渲染的vue组件
+    component: any // 被渲染的vue组件
     image: string // 组件的缩略图
     label: string // 组件名
-    params: () => T // 组件参数，在render组件的时候当props传入
 }
-export function getExportConfig<T extends MyParams> ({ componentId, component, image, params, label }: ExportConfig<T>) {
+export function getExportConfig ({ componentId, component, image, label }: ExportConfig) {
     return {
         componentId,
         component,
         image,
-        label,
-        params
+        label
     }
 }
 
 export function numberProp (label = '', value = 0) {
     return {
-        type: ParamType.number,
-        label,
-        value
+        type: Object,
+        default: () => {
+            return {
+                type: ParamType.number,
+                label,
+                value
+            }
+        }
     }
 }
 
 export function stringProp (label = '', value = '') {
     return {
-        type: ParamType.string,
-        label,
-        value
+        type: Object,
+        default: () => {
+            return {
+                type: ParamType.string,
+                label,
+                value
+            }
+        }
     }
 }
 
@@ -74,7 +58,9 @@ export function baseProps () {
     }
 }
 
-type InitParams = ReturnType<typeof baseProps>
+type InitParams = {
+    [K in keyof ReturnType<typeof baseProps>]: MyParams['x']
+}
 
 // 组件的初始化部分
 export function initComponent (root: Ref<HTMLElement | null>, params: InitParams) {
