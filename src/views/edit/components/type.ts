@@ -8,6 +8,3 @@ export type MyParams = {
         value: string | number | boolean
     }
 }
-
-// eslint-disable-next-line
-export type VueComponent = any

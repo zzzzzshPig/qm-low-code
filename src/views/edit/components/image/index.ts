@@ -3,11 +3,11 @@ import { compilerParamsToProps, initComponent } from '@/views/edit/components/he
 import { imageParams } from './export'
 
 export default defineComponent({
-    props: compilerParamsToProps(imageParams),
+    props: compilerParamsToProps(imageParams()),
 
     setup (props) {
         const root = ref<HTMLImageElement | null>(null)
-        const params = props as typeof imageParams
+        const params = props as ReturnType<typeof imageParams>
 
         initComponent(root, params)
 

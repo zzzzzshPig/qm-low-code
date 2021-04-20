@@ -1,11 +1,11 @@
 import { ComponentType } from '@/views/edit/components/const'
-import { MyParams, VueComponent } from '@/views/edit/components/type'
+import { MyParams } from '@/views/edit/components/type'
 import { Ref, watch, watchEffect } from 'vue'
 
 type MyPropType<T> = {
-    [key in keyof T]: {
+    [K in keyof T]: {
         type: ObjectConstructor,
-        default: MyParams['x']
+        default: T[K]
     }
 }
 
@@ -17,7 +17,6 @@ export enum ParamType {
 export function compilerParamsToProps<T extends MyParams> (params: T) {
     const res: MyPropType<T> = {} as never
 
-    console.log(params)
     const keys = Reflect.ownKeys(params) as string[]
 
     keys.forEach((a: keyof T) => {
@@ -33,11 +32,12 @@ export function compilerParamsToProps<T extends MyParams> (params: T) {
 }
 
 export type ExportConfig<T extends MyParams> = {
-    componentId: ComponentType
-    component: VueComponent
-    image: string
-    label: string
-    params: T
+    componentId: ComponentType // 组件Id，用于从数据中生成组件
+    // eslint-disable-next-line
+    component: Promise<{ default: any }> // 被渲染的vue组件
+    image: string // 组件的缩略图
+    label: string // 组件名
+    params: () => T // 组件参数，在render组件的时候当props传入
 }
 export function getExportConfig<T extends MyParams> ({ componentId, component, image, params, label }: ExportConfig<T>) {
     return {
@@ -74,36 +74,36 @@ export function baseProps () {
     }
 }
 
-type InitPropType = ReturnType<typeof baseProps>
+type InitParams = ReturnType<typeof baseProps>
 
 // 组件的初始化部分
-// 生成组件的基础属性
-// 绑定组件的基础事件
-export function initComponent (root: Ref<HTMLElement | null>, props: InitPropType) {
+export function initComponent (root: Ref<HTMLElement | null>, params: InitParams) {
     watch(root, init)
 
     function init () {
         const dom = root.value
 
         if (dom) {
-            initComponentStyle(dom, props)
-            initComponentEvent(dom, props)
+            initComponentStyle(dom, params)
+            initComponentEvent(dom, params)
         }
     }
 }
 
-function initComponentStyle (dom: HTMLElement, props: InitPropType) {
+// 生成组件的基础属性
+function initComponentStyle (dom: HTMLElement, params: InitParams) {
     const style = dom.style
     style.position = 'absolute'
 
     watchEffect(() => {
-        style.left = `${props.x}px`
-        style.top = `${props.y}px`
-        style.width = `${props.width}px`
-        style.height = `${props.height}px`
+        style.left = `${params.x.value}px`
+        style.top = `${params.y.value}px`
+        style.width = `${params.width.value}px`
+        style.height = `${params.height.value}px`
     })
 }
 
-function initComponentEvent (dom: HTMLElement, props: InitPropType) {
+// 绑定组件的基础事件，拖拽，移动等
+function initComponentEvent (dom: HTMLElement, props: InitParams) {
     console.log(props)
 }
