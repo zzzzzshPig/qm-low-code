@@ -22,6 +22,15 @@ function convertProps (props: MyProps) {
     return res
 }
 
+function initProps (component: ExportConfig['component']) {
+    component.props = {
+        ...baseProps(),
+        ...component.props
+    }
+
+    return reactive(convertProps(component.props) as any)
+}
+
 async function renderComponent (config: {
     component: ExportConfig['component']
     componentId: ExportConfig['componentId'],
@@ -29,11 +38,7 @@ async function renderComponent (config: {
 }) {
     const component = config.component
     const container = document.createElement('div')
-    component.props = {
-        ...component.props,
-        ...baseProps()
-    }
-    const props = reactive(convertProps(component.props) as any)
+    const props = initProps(component)
 
     container.className = `_container_class_${++classId}`
     container.onclick = showPropSetPanel.bind(null, props)
