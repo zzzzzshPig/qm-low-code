@@ -1,5 +1,5 @@
 import { ComponentType } from '@/views/edit/components/const'
-import { PropValue } from '@/views/edit/components/type'
+import { GetPropsType } from '@/views/edit/components/type'
 import { watchEffect } from 'vue'
 
 export enum ParamType {
@@ -58,9 +58,7 @@ export function baseProps () {
     }
 }
 
-type InitParams = {
-    [K in keyof ReturnType<typeof baseProps>]: PropValue
-}
+type InitParams = GetPropsType<ReturnType<typeof baseProps>>
 
 // 组件的初始化部分
 export function initComponent (root: HTMLElement, params: InitParams) {

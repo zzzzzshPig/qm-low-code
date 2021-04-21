@@ -1,7 +1,7 @@
 import { defineComponent, render, createVNode, ref, reactive } from 'vue'
 import Image from './components/image/export'
 import { MyParams, MyProps } from '@/views/edit/components/type'
-import { ExportConfig, initComponent, ParamType } from '@/views/edit/components/helper'
+import { baseProps, ExportConfig, initComponent, ParamType } from '@/views/edit/components/helper'
 
 let classId = 0
 const propList = ref<MyParams>({})
@@ -29,6 +29,10 @@ async function renderComponent (config: {
 }) {
     const component = config.component
     const container = document.createElement('div')
+    component.props = {
+        ...component.props,
+        ...baseProps()
+    }
     const props = reactive(convertProps(component.props) as any)
 
     container.className = `_container_class_${++classId}`
