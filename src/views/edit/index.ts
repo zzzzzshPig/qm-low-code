@@ -31,7 +31,7 @@ function initProps (component: ExportConfig['component']) {
     return reactive(convertProps(component.props) as any)
 }
 
-async function renderComponent (config: {
+function renderComponent (config: {
     component: ExportConfig['component']
     componentId: ExportConfig['componentId'],
     props: MyProps
