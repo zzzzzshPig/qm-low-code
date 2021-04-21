@@ -1,6 +1,5 @@
 <template>
     <img
-        ref="root"
         :src="src.value"
         alt=""
     >

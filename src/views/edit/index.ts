@@ -1,7 +1,7 @@
 import { defineComponent, render, createVNode, ref, reactive } from 'vue'
 import Image from './components/image/export'
 import { MyParams, MyProps } from '@/views/edit/components/type'
-import { ExportConfig, ParamType } from '@/views/edit/components/helper'
+import { ExportConfig, initComponent, ParamType } from '@/views/edit/components/helper'
 
 let classId = 0
 const propList = ref<MyParams>({})
@@ -29,7 +29,7 @@ async function renderComponent (config: {
 }) {
     const component = config.component
     const container = document.createElement('div')
-    const props = reactive(convertProps(component.props))
+    const props = reactive(convertProps(component.props) as any)
 
     container.className = `_container_class_${++classId}`
     container.onclick = showPropSetPanel.bind(null, props)
@@ -41,6 +41,8 @@ async function renderComponent (config: {
         id: 0,
         props
     })
+
+    initComponent(container.children[0] as HTMLElement, props)
 
     const canvas = document.querySelector('.canvas') as HTMLDivElement
     canvas.appendChild(container)

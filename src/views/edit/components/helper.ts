@@ -1,6 +1,6 @@
 import { ComponentType } from '@/views/edit/components/const'
-import { MyParams } from '@/views/edit/components/type'
-import { Ref, watch, watchEffect } from 'vue'
+import { PropValue } from '@/views/edit/components/type'
+import { watchEffect } from 'vue'
 
 export enum ParamType {
     string,
@@ -59,21 +59,13 @@ export function baseProps () {
 }
 
 type InitParams = {
-    [K in keyof ReturnType<typeof baseProps>]: MyParams['x']
+    [K in keyof ReturnType<typeof baseProps>]: PropValue
 }
 
 // 组件的初始化部分
-export function initComponent (root: Ref<HTMLElement | null>, params: InitParams) {
-    watch(root, init)
-
-    function init () {
-        const dom = root.value
-
-        if (dom) {
-            initComponentStyle(dom, params)
-            initComponentEvent(dom, params)
-        }
-    }
+export function initComponent (root: HTMLElement, params: InitParams) {
+    initComponentStyle(root, params)
+    initComponentEvent(root, params)
 }
 
 // 生成组件的基础属性
