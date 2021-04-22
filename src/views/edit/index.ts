@@ -10,7 +10,6 @@ function showPropSetPanel<T> (params: MyParams<T>) {
     propList.value = params
 }
 
-// eslint-disable-next-line
 function initProps<T extends MyProps<T>> (component: MyComponentConfig<T>) {
     const props = {
         ...baseProps(),
@@ -19,7 +18,6 @@ function initProps<T extends MyProps<T>> (component: MyComponentConfig<T>) {
 
     component.props = props
 
-    // eslint-disable-next-line
     return reactive(convertProps(props))
 }
 
@@ -41,7 +39,6 @@ function renderComponent<T extends MyProps<T>> (config: {
     insertComponent(container)
 }
 
-// eslint-disable-next-line
 function createComponent<T extends MyParams<T>> (component: MyComponentConfig, params: T) {
     const container = document.createElement('div')
     container.onclick = showPropSetPanel.bind(null, params)
