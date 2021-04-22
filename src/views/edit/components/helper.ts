@@ -1,26 +1,23 @@
 import { ComponentType } from '@/views/edit/components/const'
-import { GetPropsType } from '@/views/edit/components/type'
-import { watchEffect } from 'vue'
+import { GetPropsType, MyProps } from '@/views/edit/components/type'
+import { defineComponent, watchEffect, SetupContext } from 'vue'
+
+export type MyComponentConfig<T extends MyProps<T> = Record<string, never>> = {
+    label: string
+    props: T
+    image: string
+    componentId: ComponentType
+    emits?: string[]
+    setup: (this: void, props: GetPropsType<T & ReturnType<typeof baseProps>>, ctx: SetupContext) => void
+}
+export function MyDefineComponent<T extends MyProps<T>> (config: MyComponentConfig<T>): MyComponentConfig<T> {
+    // eslint-disable-next-line
+    return defineComponent(config as any) as any
+}
 
 export enum ParamType {
     string,
     number
-}
-
-export type ExportConfig = {
-    componentId: ComponentType // 组件Id，用于从数据中生成组件
-    // eslint-disable-next-line
-    component: any // 被渲染的vue组件
-    image: string // 组件的缩略图
-    label: string // 组件名
-}
-export function getExportConfig ({ componentId, component, image, label }: ExportConfig) {
-    return {
-        componentId,
-        component,
-        image,
-        label
-    }
 }
 
 export function numberProp (label = '', value = 0) {

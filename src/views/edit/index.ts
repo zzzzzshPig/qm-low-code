@@ -1,66 +1,66 @@
 import { defineComponent, render, createVNode, ref, reactive } from 'vue'
-import Image from './components/image/export'
 import { MyParams, MyProps } from '@/views/edit/components/type'
-import { baseProps, ExportConfig, initComponent, ParamType } from '@/views/edit/components/helper'
+import { baseProps, initComponent, MyComponentConfig, ParamType } from '@/views/edit/components/helper'
+import { componentList, convertProps, getComponentById } from './helper'
 
-let classId = 0
-const propList = ref<MyParams>({})
+let id = 0
+const propList = ref<MyParams<unknown>>({})
 
-function showPropSetPanel (params: MyParams) {
+function showPropSetPanel<T> (params: MyParams<T>) {
     propList.value = params
 }
 
-function convertProps (props: MyProps) {
-    const res: MyParams = {}
-    const keys = Reflect.ownKeys(props) as string[]
-
-    keys.forEach(a => {
-        const prop = props[a]
-        res[a] = prop.default()
-    })
-
-    return res
-}
-
-function initProps (component: ExportConfig['component']) {
-    component.props = {
+// eslint-disable-next-line
+function initProps<T extends MyProps<T>> (component: MyComponentConfig<T>) {
+    const props = {
         ...baseProps(),
         ...component.props
     }
 
-    return reactive(convertProps(component.props) as any)
+    component.props = props
+
+    // eslint-disable-next-line
+    return reactive(convertProps(props))
 }
 
-function renderComponent (config: {
-    component: ExportConfig['component']
-    componentId: ExportConfig['componentId'],
-    props: MyProps
+function renderComponent<T extends MyProps<T>> (config: {
+    componentId: MyComponentConfig['componentId'],
+    props: T
 }) {
-    const component = config.component
-    const container = document.createElement('div')
+    const component = getComponentById(config.componentId)
     const props = initProps(component)
+    const container = createComponent(component, props)
 
-    container.className = `_container_class_${++classId}`
-    container.onclick = showPropSetPanel.bind(null, props)
-
-    // need renderId
-    render(createVNode(component, props), container)
     console.log({
         componentId: config.componentId,
-        id: 0,
+        id: ++id,
         props
     })
 
     initComponent(container.children[0] as HTMLElement, props)
-
-    const canvas = document.querySelector('.canvas') as HTMLDivElement
-    canvas.appendChild(container)
+    insertComponent(container)
 }
 
-const componentList = [Image]
+// eslint-disable-next-line
+function createComponent<T extends MyParams<T>> (component: MyComponentConfig, params: T) {
+    const container = document.createElement('div')
+    container.onclick = showPropSetPanel.bind(null, params)
+
+    // need renderId
+    render(createVNode(component, params), container)
+
+    return container
+}
+
+function insertComponent (dom: Element) {
+    const canvas = document.querySelector('.canvas') as HTMLDivElement
+    canvas.appendChild(dom)
+}
 
 export default defineComponent({
     setup () {
+        console.log(componentList)
+
         return {
             paramType: ParamType,
             propList,
