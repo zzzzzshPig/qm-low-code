@@ -1,4 +1,4 @@
-import { ComponentType } from '@/views/edit/components/const'
+import { ComponentName } from '@/views/edit/components/const'
 import { GetPropsType, MyProps } from '@/views/edit/components/type'
 import { defineComponent, watchEffect, SetupContext } from 'vue'
 
@@ -6,7 +6,7 @@ export type MyComponentConfig<T extends MyProps<T> = Record<string, never>> = {
     label: string
     props: T
     image: string
-    componentId: ComponentType
+    name: ComponentName
     emits?: string[]
     setup: (this: void, props: GetPropsType<T & ReturnType<typeof baseProps>>, ctx: SetupContext) => void
 }

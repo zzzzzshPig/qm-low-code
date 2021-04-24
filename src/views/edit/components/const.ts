@@ -1,3 +1,3 @@
-export const enum ComponentType {
-    Image = 1
+export const enum ComponentName {
+    Image = 'image-component'
 }

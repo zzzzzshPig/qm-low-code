@@ -2,7 +2,7 @@
     <div class="component-list">
         <div
             v-for="item in componentList"
-            :key="item.componentId"
+            :key="item.name"
             class="item"
             @click="renderComponent(item)"
         >
@@ -17,7 +17,15 @@
         </div>
     </div>
 
-    <div class="canvas" />
+    <div class="canvas">
+        <component
+            :is="item.name"
+            v-for="item in components"
+            :key="item.id"
+            v-bind="item.props"
+            @click="showPropSetPanel(item.props)"
+        />
+    </div>
 
     <div class="prop-list">
         <div

@@ -1,14 +1,12 @@
-import { defineComponent, render, createVNode, ref, reactive } from 'vue'
+import { defineComponent, ref, reactive } from 'vue'
 import { MyParams, MyProps } from '@/views/edit/components/type'
-import { baseProps, initComponent, MyComponentConfig, ParamType } from '@/views/edit/components/helper'
-import { componentList, convertProps, getComponentById } from './helper'
+import { baseProps, MyComponentConfig, ParamType } from '@/views/edit/components/helper'
+import { componentList, convertProps, createWithdrawal } from './helper'
+import { ComponentName } from '@/views/edit/components/const'
 
 let id = 0
 const propList = ref<MyParams<unknown>>({})
-
-function showPropSetPanel<T> (params: MyParams<T>) {
-    propList.value = params
-}
+const components = ref<Array<{ name: MyComponentConfig['name'], id: number, props: MyParams<unknown> }>>([])
 
 function initProps<T extends MyProps<T>> (component: MyComponentConfig<T>) {
     const props = {
@@ -21,48 +19,49 @@ function initProps<T extends MyProps<T>> (component: MyComponentConfig<T>) {
     return reactive(convertProps(props))
 }
 
-function renderComponent<T extends MyProps<T>> (config: {
-    componentId: MyComponentConfig['componentId'],
-    props: T
-}) {
-    const component = getComponentById(config.componentId)
-    const props = initProps(component)
-    const container = createComponent(component, props)
+function renderComponent<T extends MyProps<T>> (item: MyComponentConfig) {
+    const props = initProps(item)
 
-    console.log({
-        componentId: config.componentId,
+    const component = {
+        name: item.name,
         id: ++id,
         props
-    })
+    }
+    components.value.push(component)
 
-    initComponent(container.children[0] as HTMLElement, props)
-    insertComponent(container)
-}
-
-function createComponent<T extends MyParams<T>> (component: MyComponentConfig, params: T) {
-    const container = document.createElement('div')
-    container.onclick = showPropSetPanel.bind(null, params)
-
-    // need renderId
-    render(createVNode(component, params), container)
-
-    return container
-}
-
-function insertComponent (dom: Element) {
-    const canvas = document.querySelector('.canvas') as HTMLDivElement
-    canvas.appendChild(dom)
+    // initComponent(container.children[0] as HTMLElement, props)
+    return component
 }
 
 export default defineComponent({
+    components: (() => {
+        const res: Record<ComponentName, MyComponentConfig> = {} as never
+
+        componentList.forEach(a => {
+            res[a.name] = a
+        })
+
+        return res
+    })(),
+
     setup () {
-        console.log(componentList)
+        const withdrawal = createWithdrawal()
 
         return {
             paramType: ParamType,
             propList,
+            components,
             componentList,
-            renderComponent
+            renderComponent (item: MyComponentConfig) {
+                const component = renderComponent(item)
+
+                withdrawal.push((action) => {
+                    console.log(action, component)
+                })
+            },
+            showPropSetPanel (params: MyParams<unknown>) {
+                propList.value = params
+            }
         }
     }
 })

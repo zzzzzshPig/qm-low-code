@@ -1,9 +1,9 @@
 import { MyDefineComponent, stringProp } from '@/views/edit/components/helper'
 import image from '@/views/edit/components/image/image.svg'
-import { ComponentType } from '@/views/edit/components/const'
+import { ComponentName } from '@/views/edit/components/const'
 
 export default MyDefineComponent({
-    componentId: ComponentType.Image,
+    name: ComponentName.Image,
 
     label: '图片',
 
