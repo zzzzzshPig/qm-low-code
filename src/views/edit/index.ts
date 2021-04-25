@@ -64,16 +64,15 @@ export default defineComponent({
             componentList,
             renderComponent (item: MyComponentConfig) {
                 // 记录此时的components状态
-                const cloneComponents = cloneDeep(components.value)
+                const nowIndex = components.value.length
+                let restoreComponent!: ComponentItem[]
 
                 withdrawal.push(() => {
-                    const components2 = components.value
+                    restoreComponent = components.value
 
-                    components.value = cloneComponents
-
-                    return () => {
-                        components.value = components2
-                    }
+                    components.value = components.value.slice(0, nowIndex)
+                }, () => {
+                    components.value = restoreComponent
                 })
 
                 insertComponent(renderComponent(item))

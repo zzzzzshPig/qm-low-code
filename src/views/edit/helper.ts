@@ -18,14 +18,12 @@ export function convertProps<T extends MyProps<T>> (props: T) {
     return Object.fromEntries(res.entries()) as GetPropsType<T>
 }
 
-type RestoreFunc = () => void
-
-type QueueItem = () => RestoreFunc
+type QueueItem = () => void
 
 export function createWithdrawal () {
     const queue: Array<{
         revoke: QueueItem
-        restore: RestoreFunc
+        restore: QueueItem
     }> = []
     // 保存记录的最大深度
     const depth = 100
@@ -60,7 +58,7 @@ export function createWithdrawal () {
         }
 
         step--
-        queue[step].restore = queue[step].revoke()
+        queue[step].revoke()
     }
 
     function callRestore () {
@@ -73,7 +71,7 @@ export function createWithdrawal () {
     }
 
     // 保存撤销的回调
-    function push (revoke: QueueItem) {
+    function push (revoke: QueueItem, restore: QueueItem) {
         const now = Date.now()
 
         // 连续触发 不监听
@@ -97,9 +95,7 @@ export function createWithdrawal () {
         queue.push({
             revoke,
             // 站位
-            restore: () => {
-                console.error('你的revoke函数没有返回restore，请检查你的代码')
-            }
+            restore
         })
     }
 
