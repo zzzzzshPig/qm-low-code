@@ -94,7 +94,6 @@ export function createWithdrawal () {
         step++
         queue.push({
             revoke,
-            // 站位
             restore
         })
     }
