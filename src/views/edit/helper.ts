@@ -71,11 +71,11 @@ export function createWithdrawal () {
     }
 
     // 保存撤销的回调
-    function push (revoke: QueueItem, restore: QueueItem) {
+    function push (revoke: QueueItem, restore: QueueItem, customDelay = delay) {
         const now = Date.now()
 
         // 连续触发 不监听
-        if (now - time <= delay) {
+        if (now - time <= customDelay) {
             time = now
             return
         }

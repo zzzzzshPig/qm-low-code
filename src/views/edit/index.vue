@@ -22,6 +22,7 @@
             :is="item.name"
             v-for="item in components"
             :key="item.id"
+            :class="item.className"
             v-bind="item.props"
             @click="showPropSetPanel(item.props)"
         />

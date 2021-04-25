@@ -1,9 +1,8 @@
 import { defineComponent, ref, reactive } from 'vue'
 import { MyParams, MyProps } from '@/views/edit/components/type'
-import { baseProps, MyComponentConfig, ParamType } from '@/views/edit/components/helper'
+import { baseProps, initComponent, MyComponentConfig, ParamType } from '@/views/edit/components/helper'
 import { componentList, convertProps, createWithdrawal } from './helper'
 import { ComponentName } from '@/views/edit/components/const'
-import { cloneDeep } from 'lodash'
 
 let id = 0
 const propList = ref<MyParams<unknown>>({})
@@ -11,6 +10,7 @@ const propList = ref<MyParams<unknown>>({})
 type ComponentItem = {
     name: MyComponentConfig['name']
     id: number
+    className: string
     props: MyParams<unknown>
 }
 const components = ref<ComponentItem[]>([])
@@ -29,13 +29,17 @@ function initProps<T extends MyProps<T>> (component: MyComponentConfig<T>) {
 function renderComponent<T extends MyProps<T>> (item: MyComponentConfig) {
     const props = initProps(item)
 
+    const componentId = ++id
     const component = {
+        className: `random_dom_class_${componentId}`,
         name: item.name,
-        id: ++id,
+        id: componentId,
         props
     }
 
-    // initComponent(container.children[0] as HTMLElement, props)
+    setTimeout(() => {
+        initComponent(document.querySelector(`.${component.className}`) as HTMLElement, props)
+    }, 0)
     return component
 }
 
@@ -63,17 +67,17 @@ export default defineComponent({
             components,
             componentList,
             renderComponent (item: MyComponentConfig) {
-                // 记录此时的components状态
+                // 使用下标记录，如果之前的组件的值发生改变则会产生bug
+                // 目前暂时没有会改变的情况
                 const nowIndex = components.value.length
                 let restoreComponent!: ComponentItem[]
 
                 withdrawal.push(() => {
                     restoreComponent = components.value
-
                     components.value = components.value.slice(0, nowIndex)
                 }, () => {
                     components.value = restoreComponent
-                })
+                }, 0)
 
                 insertComponent(renderComponent(item))
             },

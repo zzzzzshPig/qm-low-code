@@ -77,6 +77,6 @@ function initComponentStyle (dom: HTMLElement, params: InitParams) {
 }
 
 // 绑定组件的基础事件，拖拽，移动等
-function initComponentEvent (dom: HTMLElement, props: InitParams) {
+export function initComponentEvent (dom: HTMLElement, props: InitParams) {
     console.log(props)
 }
