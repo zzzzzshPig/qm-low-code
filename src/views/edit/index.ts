@@ -3,10 +3,17 @@ import { MyParams, MyProps } from '@/views/edit/components/type'
 import { baseProps, MyComponentConfig, ParamType } from '@/views/edit/components/helper'
 import { componentList, convertProps, createWithdrawal } from './helper'
 import { ComponentName } from '@/views/edit/components/const'
+import { cloneDeep } from 'lodash'
 
 let id = 0
 const propList = ref<MyParams<unknown>>({})
-const components = ref<Array<{ name: MyComponentConfig['name'], id: number, props: MyParams<unknown> }>>([])
+
+type ComponentItem = {
+    name: MyComponentConfig['name']
+    id: number
+    props: MyParams<unknown>
+}
+const components = ref<ComponentItem[]>([])
 
 function initProps<T extends MyProps<T>> (component: MyComponentConfig<T>) {
     const props = {
@@ -27,10 +34,13 @@ function renderComponent<T extends MyProps<T>> (item: MyComponentConfig) {
         id: ++id,
         props
     }
-    components.value.push(component)
 
     // initComponent(container.children[0] as HTMLElement, props)
     return component
+}
+
+function insertComponent (component: ComponentItem) {
+    components.value.push(component)
 }
 
 export default defineComponent({
@@ -53,11 +63,20 @@ export default defineComponent({
             components,
             componentList,
             renderComponent (item: MyComponentConfig) {
-                const component = renderComponent(item)
+                // 记录此时的components状态
+                const cloneComponents = cloneDeep(components.value)
 
-                withdrawal.push((action) => {
-                    console.log(action, component)
+                withdrawal.push(() => {
+                    const components2 = components.value
+
+                    components.value = cloneComponents
+
+                    return () => {
+                        components.value = components2
+                    }
                 })
+
+                insertComponent(renderComponent(item))
             },
             showPropSetPanel (params: MyParams<unknown>) {
                 propList.value = params

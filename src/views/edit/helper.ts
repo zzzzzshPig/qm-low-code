@@ -18,25 +18,32 @@ export function convertProps<T extends MyProps<T>> (props: T) {
     return Object.fromEntries(res.entries()) as GetPropsType<T>
 }
 
-enum ActionType {
-    Revoke,
-    Restore,
-}
-type QueueItem = (action: ActionType) => void
+type RestoreFunc = () => void
+
+type QueueItem = () => RestoreFunc
 
 export function createWithdrawal () {
-    // 指针
-    const queue: Array<QueueItem> = []
+    const queue: Array<{
+        revoke: QueueItem
+        restore: RestoreFunc
+    }> = []
+    // 保存记录的最大深度
     const depth = 100
+    // 保存间隔时长
     const delay = 1000
     let time = 0
-    let step = -1
+    // 指针
+    let step = 0
 
     function registerKey (e: KeyboardEvent) {
         const isZ = e.key === 'z'
 
         if (e.metaKey && isZ) {
-            call(!e.shiftKey ? ActionType.Revoke : ActionType.Restore)
+            if (e.shiftKey) {
+                callRestore()
+            } else {
+                callRevoke()
+            }
         }
     }
 
@@ -46,24 +53,27 @@ export function createWithdrawal () {
         window.removeEventListener('keydown', registerKey)
     })
 
-    function call (action: ActionType) {
-        if (!queue[step]) return
-
-        if (action === ActionType.Revoke) {
-            queue[step](action)
-            step -= 1
-        } else if (action === ActionType.Restore) {
-            step += 1
-            queue[step](action)
+    function callRevoke () {
+        if (step <= 0) {
+            step = 0
+            return
         }
 
-        if (step < 0 || step > queue.length) {
-            step = Math.min(Math.max(0, step), queue.length)
-        }
+        step--
+        queue[step].restore = queue[step].revoke()
     }
 
-    // 保存撤销和回撤的回调
-    function push (cb: QueueItem) {
+    function callRestore () {
+        if (step >= queue.length) {
+            return
+        }
+
+        queue[step].restore()
+        step++
+    }
+
+    // 保存撤销的回调
+    function push (revoke: QueueItem) {
         const now = Date.now()
 
         // 连续触发 不监听
@@ -71,6 +81,7 @@ export function createWithdrawal () {
             time = now
             return
         }
+        time = now
 
         // 超出最大深度
         if (queue.length > depth) {
@@ -83,11 +94,16 @@ export function createWithdrawal () {
         }
 
         step++
-        queue.push(cb)
+        queue.push({
+            revoke,
+            // 站位
+            restore: () => {
+                console.error('你的revoke函数没有返回restore，请检查你的代码')
+            }
+        })
     }
 
     return {
-        push,
-        ActionType
+        push
     }
 }
