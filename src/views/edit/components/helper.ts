@@ -1,6 +1,7 @@
 import { ComponentName } from '@/views/edit/components/const'
 import { GetPropsType, MyProps } from '@/views/edit/components/type'
-import { defineComponent, watchEffect, SetupContext } from 'vue'
+import { computed, defineComponent, SetupContext } from 'vue'
+import { convertProps } from '@/views/edit/helper'
 
 export type MyComponentConfig<T extends MyProps<T> = Record<string, never>> = {
     label: string
@@ -57,26 +58,35 @@ export function baseProps () {
 
 type InitParams = GetPropsType<ReturnType<typeof baseProps>>
 
-// 组件的初始化部分
-export function initComponent (root: HTMLElement, params: InitParams) {
-    initComponentStyle(root, params)
-    initComponentEvent(root, params)
+export function initProps<T extends MyProps<T>> (component: MyComponentConfig<T>) {
+    const props = {
+        ...baseProps(),
+        ...component.props
+    }
+
+    component.props = props
+
+    return convertProps(props)
 }
 
 // 生成组件的基础属性
-function initComponentStyle (dom: HTMLElement, params: InitParams) {
-    const style = dom.style
-    style.position = 'absolute'
-
-    watchEffect(() => {
-        style.left = `${params.x.value}px`
-        style.top = `${params.y.value}px`
-        style.width = `${params.width.value}px`
-        style.height = `${params.height.value}px`
+export function initComponentStyle (params: InitParams) {
+    return computed(() => {
+        return {
+            position: 'absolute',
+            left: `${params.x.value}px`,
+            top: `${params.y.value}px`,
+            width: `${params.width.value}px`,
+            height: `${params.height.value}px`
+        }
     })
 }
 
 // 绑定组件的基础事件，拖拽，移动等
-export function initComponentEvent (dom: HTMLElement, props: InitParams) {
-    console.log(props)
+export function initComponentEvent (props: InitParams) {
+    return {
+        click () {
+            console.log(props)
+        }
+    }
 }
