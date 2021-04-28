@@ -7,6 +7,7 @@ import { cloneDeep } from 'lodash'
 import { EditComponent } from '@/views/edit/types'
 
 let id = 0
+
 const propList = ref<MyParams<unknown>>({})
 
 const components = ref<EditComponent[]>([])
@@ -59,13 +60,12 @@ export default defineComponent({
         watchEffect(() => {
             // 虽然数据被修改是会被回撤的，理论上回撤到这里数据和当初保存的应该是一致的
             // 但是为了后续有可能会扩展不需要记录回撤的属性值，所以这里还是选择clone一份
-            const oldData = cloneDeep(components.value)
-
             if (limit) {
                 limit = false
                 return
             }
 
+            const oldData = cloneDeep(components.value)
             let restoreData !: EditComponent[]
 
             withdrawal.push(() => {
