@@ -4,7 +4,7 @@
             v-for="item in componentList"
             :key="item.name"
             class="item"
-            @click="renderComponent(item)"
+            @click="addComponent(item)"
         >
             <img
                 :src="item.image"
@@ -22,9 +22,10 @@
             :is="item.name"
             v-for="item in components"
             :key="item.id"
+            :class="item.className"
             :style="item.style"
             v-bind="item.props"
-            @click="showPropSetPanel(item.props)"
+            @click="selectComponent(item)"
         />
     </div>
 
@@ -65,6 +66,11 @@
         height: 667px;
         border: 1px solid rgba(0, 0, 0, .1);
         transform: translateX(-50%);
+
+        .select {
+            box-shadow: 0 0 4px 0 #00b7ff;
+            border-radius: 10%;
+        }
     }
 
     .component-list {

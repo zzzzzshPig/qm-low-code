@@ -1,9 +1,8 @@
-import { defineComponent, reactive, ref, watchEffect } from 'vue'
+import { defineComponent, reactive, ref } from 'vue'
 import { MyParams, MyProps } from '@/views/edit/components/type'
 import { initComponentEvent, initComponentStyle, initProps, MyComponentConfig, ParamType } from '@/views/edit/components/helper'
 import { componentList, createWithdrawal } from './helper'
 import { ComponentName } from '@/views/edit/components/const'
-import { cloneDeep } from 'lodash'
 import { EditComponent } from '@/views/edit/types'
 
 let id = 0
@@ -19,11 +18,20 @@ function renderComponent<T extends MyProps<T>> (item: MyComponentConfig) {
         name: item.name,
         id: ++id,
         props: props,
+        className: {},
         style: initComponentStyle(props) as never,
         event: initComponentEvent(props)
     }
 
-    insertComponent(component)
+    return component
+}
+
+function highlightComponent (component: EditComponent) {
+    components.value.forEach(a => {
+        a.className.select = false
+    })
+
+    component.className.select = true
 }
 
 function insertComponent (component: EditComponent) {
@@ -55,41 +63,33 @@ export default defineComponent({
         components.value = getDataById()
 
         const withdrawal = createWithdrawal()
-        let limit = false
 
-        watchEffect(() => {
-            // 虽然数据被修改是会被回撤的，理论上回撤到这里数据和当初保存的应该是一致的
-            // 但是为了后续有可能会扩展不需要记录回撤的属性值，所以这里还是选择clone一份
-            if (limit) {
-                limit = false
-                return
-            }
+        function selectComponent (component: EditComponent) {
+            propList.value = component.props
 
-            // 虽然数据被修改是会被回撤的，理论上回撤到这里数据和当初保存的应该是一致的
-            // 但是为了后续有可能会扩展不需要记录回撤的属性值，所以这里还是选择clone一份
-            const oldData = cloneDeep(components.value)
-
-            let restoreData !: EditComponent[]
-
-            withdrawal.push(() => {
-                restoreData = components.value
-                components.value = oldData
-                limit = true
-            }, () => {
-                components.value = restoreData
-                limit = true
-            })
-        })
+            // 高亮组件
+            highlightComponent(component)
+        }
 
         return {
             paramType: ParamType,
             propList,
             components,
             componentList,
-            renderComponent,
-            showPropSetPanel (params: MyParams<unknown>) {
-                propList.value = params
-            }
+            addComponent: (item: MyComponentConfig) => {
+                const component = renderComponent(item)
+
+                withdrawal.push(() => {
+                    components.value.pop()
+                    selectComponent(components.value[components.value.length - 1])
+                }, () => {
+                    components.value.push(component)
+                    selectComponent(component)
+                })
+
+                insertComponent(component)
+            },
+            selectComponent
         }
     }
 })

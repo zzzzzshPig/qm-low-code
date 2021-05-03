@@ -28,7 +28,7 @@ export function createWithdrawal () {
     // 保存记录的最大深度
     const depth = 100
     // 保存间隔时长
-    const delay = 1000
+    const delay = 0
     let time = 0
     // 指针
     let step = 0
