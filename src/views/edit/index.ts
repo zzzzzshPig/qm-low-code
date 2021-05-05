@@ -1,5 +1,5 @@
 import { defineComponent, onUnmounted, reactive, ref, watch, computed } from 'vue'
-import { MyParams, MyProps } from '@/views/edit/components/type'
+import { MyProps } from '@/views/edit/components/type'
 import { initComponentStyle, initProps, MyComponentConfig, ParamType } from '@/views/edit/components/helper'
 import { componentList, createWithdrawal } from './helper'
 import { ComponentName } from '@/views/edit/components/const'
