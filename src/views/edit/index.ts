@@ -1,41 +1,96 @@
-import { defineComponent, reactive, ref } from 'vue'
+import { defineComponent, onUnmounted, reactive, ref, watch, computed } from 'vue'
 import { MyParams, MyProps } from '@/views/edit/components/type'
-import { initComponentEvent, initComponentStyle, initProps, MyComponentConfig, ParamType } from '@/views/edit/components/helper'
+import { initComponentStyle, initProps, MyComponentConfig, ParamType } from '@/views/edit/components/helper'
 import { componentList, createWithdrawal } from './helper'
 import { ComponentName } from '@/views/edit/components/const'
 import { EditComponent } from '@/views/edit/types'
-
-let id = 0
-
-const propList = ref<MyParams<unknown>>({})
+import { cloneDeep } from 'lodash'
 
 const components = ref<EditComponent[]>([])
 
-function renderComponent<T extends MyProps<T>> (item: MyComponentConfig) {
-    const props = reactive(initProps(item))
+function useCanvasPanel () {
+    const data = components
 
-    const component: EditComponent = {
-        name: item.name,
-        id: ++id,
-        props: props,
-        className: {},
-        style: initComponentStyle(props) as never,
-        event: initComponentEvent(props)
+    let id = 0
+
+    function render<T extends MyProps<T>> (item: MyComponentConfig) {
+        const props = reactive(initProps(item))
+
+        const component: EditComponent = {
+            name: item.name,
+            id: ++id,
+            props: props,
+            select: false
+        }
+
+        return component
     }
 
-    return component
+    function getData () {
+        // 模拟获取保存的数据
+        const id = 123
+
+        function getDataById (): EditComponent[] {
+            if (id) {
+                return []
+            }
+
+            return []
+        }
+
+        data.value = getDataById()
+    }
+    getData()
+
+    function insert (component: EditComponent) {
+        data.value.push(component)
+    }
+
+    let lastComponent: EditComponent
+
+    function select (component: EditComponent) {
+        if (component.select) {
+            return
+        }
+
+        if (lastComponent) {
+            lastComponent.select = false
+        }
+
+        lastComponent = component
+        component.select = true
+    }
+
+    function noSelect () {
+        if (lastComponent) {
+            lastComponent.select = false
+        }
+    }
+
+    return {
+        data,
+        select,
+        noSelect,
+        insert,
+        render
+    }
 }
 
-function highlightComponent (component: EditComponent) {
-    components.value.forEach(a => {
-        a.className.select = false
+// 属性面板相关
+function usePropPanel () {
+    const data = computed(() => {
+        const component = components.value.filter(a => a.select)[0]
+
+        if (!component) return undefined
+
+        return component.props
     })
+    const inputType = ParamType
 
-    component.className.select = true
-}
-
-function insertComponent (component: EditComponent) {
-    components.value.push(component)
+    return {
+        data,
+        inputType
+    }
 }
 
 export default defineComponent({
@@ -50,46 +105,76 @@ export default defineComponent({
     })(),
 
     setup () {
-        // 模拟获取保存的数据
-        const id = 123
-        function getDataById (): EditComponent[] {
-            if (id) {
-                return []
+        const propPanel = usePropPanel()
+        const canvasPanel = useCanvasPanel()
+        const withdrawal = createWithdrawal<EditComponent[]>()
+
+        onUnmounted(() => {
+            withdrawal.destroy()
+        })
+
+        withdrawal.push(cloneDeep(canvasPanel.data.value), 0)
+
+        // target 修改前的状态
+        // source 修改后的状态
+        // function diffComponent (old: EditComponent[], now: EditComponent[]) {
+        //     const len = Math.max(old.length, now.length)
+        //
+        //     for (let i = 0; i < len; i++) {
+        //         const o = old[i]
+        //         const n = now[i]
+        //
+        //         // 新增删除组件
+        //         if (!o || !n || o.id !== n.id) {
+        //             console.log('组件被修改')
+        //             break
+        //         } else if (JSON.stringify(o.props) !== JSON.stringify(n.props)) {
+        //             // 属性发生修改
+        //             console.log('属性发生修改')
+        //             break
+        //         }
+        //     }
+        // }
+
+        function watchComponents () {
+            let skipWatch = false
+
+            watch(canvasPanel.data, () => {
+                if (skipWatch) {
+                    skipWatch = false
+                    return
+                }
+
+                withdrawal.push(cloneDeep(canvasPanel.data.value))
+            }, {
+                deep: true
+            })
+
+            function update (data: EditComponent[]) {
+                // diffComponent(canvasPanel.data.value, data)
+
+                canvasPanel.data.value = cloneDeep(data)
+
+                skipWatch = true
             }
 
-            return []
+            withdrawal.onRevoke(update)
+            withdrawal.onRestore(update)
         }
-
-        components.value = getDataById()
-
-        const withdrawal = createWithdrawal()
-
-        function selectComponent (component: EditComponent) {
-            propList.value = component.props
-
-            // 高亮组件
-            highlightComponent(component)
-        }
+        watchComponents()
 
         return {
-            paramType: ParamType,
-            propList,
-            components,
             componentList,
-            addComponent: (item: MyComponentConfig) => {
-                const component = renderComponent(item)
-
-                withdrawal.push(() => {
-                    components.value.pop()
-                    selectComponent(components.value[components.value.length - 1])
-                }, () => {
-                    components.value.push(component)
-                    selectComponent(component)
-                })
-
-                insertComponent(component)
+            inputType: propPanel.inputType,
+            propList: propPanel.data,
+            components: canvasPanel.data,
+            addComponent (item: MyComponentConfig) {
+                const component = canvasPanel.render(item)
+                canvasPanel.insert(component)
             },
-            selectComponent
+            selectComponent: canvasPanel.select,
+            noSelectComponent: canvasPanel.noSelect,
+            initComponentStyle
         }
     }
 })

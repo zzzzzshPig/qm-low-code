@@ -5,7 +5,5 @@ export type EditComponent = {
     name: MyComponentConfig['name']
     id: number
     props: MyParams<unknown>
-    style: Record<string, string>
-    className: Record<string, boolean>
-    event: Record<string, () => void>
+    select: boolean
 }

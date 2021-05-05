@@ -17,19 +17,27 @@
         </div>
     </div>
 
-    <div class="canvas">
+    <div
+        class="canvas"
+        @click="noSelectComponent"
+    >
         <component
             :is="item.name"
             v-for="item in components"
             :key="item.id"
-            :class="item.className"
-            :style="item.style"
+            :class="{
+                select: item.select
+            }"
+            :style="initComponentStyle(item.props)"
             v-bind="item.props"
-            @click="selectComponent(item)"
+            @click.stop="selectComponent(item)"
         />
     </div>
 
-    <div class="prop-list">
+    <div
+        v-if="propList"
+        class="prop-list"
+    >
         <div
             v-for="(item, key) in propList"
             :key="key"
@@ -40,17 +48,16 @@
             </div>
 
             <a-input
-                v-if="item.type === paramType.string"
+                v-if="item.type === inputType.string"
                 v-model:value="item.value"
                 class="input"
                 type="text"
             />
 
-            <a-input
-                v-if="item.type === paramType.number"
+            <a-input-number
+                v-if="item.type === inputType.number"
                 v-model:value="item.value"
                 class="input"
-                type="number"
             />
         </div>
     </div>

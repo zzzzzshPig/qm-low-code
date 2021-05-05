@@ -1,6 +1,6 @@
 import { ComponentName } from '@/views/edit/components/const'
 import { GetPropsType, MyProps } from '@/views/edit/components/type'
-import { computed, defineComponent, SetupContext } from 'vue'
+import { defineComponent, SetupContext } from 'vue'
 import { convertProps } from '@/views/edit/helper'
 
 export type MyComponentConfig<T extends MyProps<T> = Record<string, never>> = {
@@ -71,22 +71,11 @@ export function initProps<T extends MyProps<T>> (component: MyComponentConfig<T>
 
 // 生成组件的基础属性
 export function initComponentStyle (params: InitParams) {
-    return computed(() => {
-        return {
-            position: 'absolute',
-            left: `${params.x.value}px`,
-            top: `${params.y.value}px`,
-            width: `${params.width.value}px`,
-            height: `${params.height.value}px`
-        }
-    })
-}
-
-// 绑定组件的基础事件，拖拽，移动等
-export function initComponentEvent (props: InitParams) {
     return {
-        click () {
-            console.log(props)
-        }
+        position: 'absolute',
+        left: `${params.x.value}px`,
+        top: `${params.y.value}px`,
+        width: `${params.width.value}px`,
+        height: `${params.height.value}px`
     }
 }

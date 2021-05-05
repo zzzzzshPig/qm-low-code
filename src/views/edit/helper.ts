@@ -1,7 +1,7 @@
 import Image from './components/image/index.vue'
 import { MyComponentConfig } from '@/views/edit/components/helper'
 import { GetPropsType, MyProps, PropValue } from '@/views/edit/components/type'
-import { onUnmounted } from 'vue'
+import { useDebounce } from '@/utils'
 
 // eslint-disable-next-line
 export const componentList: MyComponentConfig[] = [Image] as any
@@ -18,20 +18,14 @@ export function convertProps<T extends MyProps<T>> (props: T) {
     return Object.fromEntries(res.entries()) as GetPropsType<T>
 }
 
-type QueueItem = () => void
-
-export function createWithdrawal () {
-    const queue: Array<{
-        revoke: QueueItem
-        restore: QueueItem
-    }> = []
+export function createWithdrawal<T> () {
+    const queue: Array<T> = []
     // 保存记录的最大深度
     const depth = 100
     // 保存间隔时长
-    const delay = 0
-    let time = 0
+    const delay = 300
     // 指针
-    let step = 0
+    let step = -1
 
     function registerKey (e: KeyboardEvent) {
         const isZ = e.key === 'z'
@@ -47,58 +41,65 @@ export function createWithdrawal () {
 
     // 初始化快捷键
     window.addEventListener('keydown', registerKey)
-    onUnmounted(() => {
+
+    function destroy () {
         window.removeEventListener('keydown', registerKey)
-    })
+    }
+
+    let onRevokeCb: (data: T) => void = () => undefined
+
+    function onRevoke (fn = onRevokeCb) {
+        onRevokeCb = fn
+    }
+
+    let onRestoreCb: (data: T) => void = () => undefined
+
+    function onRestore (fn = onRestoreCb) {
+        onRestoreCb = fn
+    }
 
     function callRevoke () {
         if (step <= 0) {
-            step = 0
             return
         }
 
         step--
-        queue[step].revoke()
+        onRevokeCb(queue[step])
     }
 
     function callRestore () {
-        if (step >= queue.length) {
+        if (step >= queue.length - 1) {
             return
         }
 
-        queue[step].restore()
         step++
+        onRestoreCb(queue[step])
     }
 
     // 保存撤销的回调
-    function push (revoke: QueueItem, restore: QueueItem, customDelay = delay) {
-        const now = Date.now()
+    const debounce = useDebounce()
+    function push (data: T, customDelay = delay) {
+        debounce.apply(() => {
+            // 超出最大深度
+            if (queue.length > depth) {
+                queue.shift()
+            }
 
-        // 连续触发 不监听
-        if (now - time <= customDelay) {
-            time = now
-            return
-        }
-        time = now
+            // 撤销之后 新修改了值
+            if (step < queue.length - 1) {
+                queue.splice(step + 1)
+            }
 
-        // 超出最大深度
-        if (queue.length > depth) {
-            queue.shift()
-        }
-
-        // 撤销之后 新修改了值
-        if (step < queue.length) {
-            queue.splice(step)
-        }
-
-        step++
-        queue.push({
-            revoke,
-            restore
-        })
+            step++
+            queue.push(data)
+            console.log(queue)
+        }, customDelay)
     }
 
     return {
-        push
+        push,
+        destroy,
+        onRestore,
+        onRevoke
     }
 }
