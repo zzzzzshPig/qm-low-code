@@ -8,6 +8,14 @@ import { cloneDeep } from 'lodash'
 
 const components = ref<EditComponent[]>([])
 
+function getComponentById (id: EditComponent['id']) {
+    for (const a of components.value) {
+        if (a.id === id) {
+            return a
+        }
+    }
+}
+
 function useCanvasPanel () {
     const data = components
 
@@ -46,22 +54,22 @@ function useCanvasPanel () {
         data.value.push(component)
     }
 
-    let lastComponent: EditComponent
+    let lastComponentId: EditComponent['id']
 
     function select (component: EditComponent) {
         if (component.select) {
             return
         }
 
-        if (lastComponent) {
-            lastComponent.select = false
-        }
+        noSelect()
 
-        lastComponent = component
+        lastComponentId = component.id
         component.select = true
     }
 
     function noSelect () {
+        const lastComponent = getComponentById(lastComponentId)
+
         if (lastComponent) {
             lastComponent.select = false
         }
@@ -78,6 +86,7 @@ function useCanvasPanel () {
 
 // 属性面板相关
 function usePropPanel () {
+    // 显示被选中的元素的props
     const data = computed(() => {
         const component = components.value.filter(a => a.select)[0]
 
@@ -113,30 +122,9 @@ export default defineComponent({
             withdrawal.destroy()
         })
 
-        withdrawal.push(cloneDeep(canvasPanel.data.value), 0)
-
-        // target 修改前的状态
-        // source 修改后的状态
-        // function diffComponent (old: EditComponent[], now: EditComponent[]) {
-        //     const len = Math.max(old.length, now.length)
-        //
-        //     for (let i = 0; i < len; i++) {
-        //         const o = old[i]
-        //         const n = now[i]
-        //
-        //         // 新增删除组件
-        //         if (!o || !n || o.id !== n.id) {
-        //             console.log('组件被修改')
-        //             break
-        //         } else if (JSON.stringify(o.props) !== JSON.stringify(n.props)) {
-        //             // 属性发生修改
-        //             console.log('属性发生修改')
-        //             break
-        //         }
-        //     }
-        // }
-
         function watchComponents () {
+            withdrawal.push(cloneDeep(canvasPanel.data.value), 0)
+
             let skipWatch = false
 
             watch(canvasPanel.data, () => {
@@ -145,14 +133,13 @@ export default defineComponent({
                     return
                 }
 
+                console.log('watchSuccess', JSON.stringify(canvasPanel.data.value, undefined, 4))
                 withdrawal.push(cloneDeep(canvasPanel.data.value))
             }, {
                 deep: true
             })
 
             function update (data: EditComponent[]) {
-                // diffComponent(canvasPanel.data.value, data)
-
                 canvasPanel.data.value = cloneDeep(data)
 
                 skipWatch = true
@@ -161,6 +148,7 @@ export default defineComponent({
             withdrawal.onRevoke(update)
             withdrawal.onRestore(update)
         }
+
         watchComponents()
 
         return {

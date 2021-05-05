@@ -25,7 +25,7 @@ export function createWithdrawal<T> () {
     // 保存间隔时长
     const delay = 300
     // 指针
-    let step = -1
+    let step = 0
 
     function registerKey (e: KeyboardEvent) {
         const isZ = e.key === 'z'
@@ -59,21 +59,23 @@ export function createWithdrawal<T> () {
     }
 
     function callRevoke () {
-        if (step <= 0) {
+        if (step <= 1) {
             return
         }
 
         step--
-        onRevokeCb(queue[step])
+        onRevokeCb(queue[step - 1])
+        console.log(step)
     }
 
     function callRestore () {
-        if (step >= queue.length - 1) {
+        if (step >= queue.length) {
             return
         }
 
-        step++
         onRestoreCb(queue[step])
+        step++
+        console.log(step)
     }
 
     // 保存撤销的回调
@@ -85,14 +87,14 @@ export function createWithdrawal<T> () {
                 queue.shift()
             }
 
-            // 撤销之后 新修改了值
-            if (step < queue.length - 1) {
-                queue.splice(step + 1)
-            }
+            // 撤销之后又修改内容，撤销点后的原有内容舍弃
+            queue.length = step
 
             step++
+
             queue.push(data)
-            console.log(queue)
+
+            console.log(step)
         }, customDelay)
     }
 
