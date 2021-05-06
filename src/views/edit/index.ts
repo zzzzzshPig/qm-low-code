@@ -122,18 +122,17 @@ export default defineComponent({
             withdrawal.destroy()
         })
 
+        const skipWatch = ref(false)
+
         function watchComponents () {
             withdrawal.push(cloneDeep(canvasPanel.data.value), 0)
 
-            let skipWatch = false
-
             watch(canvasPanel.data, () => {
-                if (skipWatch) {
-                    skipWatch = false
+                if (skipWatch.value) {
+                    skipWatch.value = false
                     return
                 }
 
-                console.log('watchSuccess', JSON.stringify(canvasPanel.data.value, undefined, 4))
                 withdrawal.push(cloneDeep(canvasPanel.data.value))
             }, {
                 deep: true
@@ -142,7 +141,7 @@ export default defineComponent({
             function update (data: EditComponent[]) {
                 canvasPanel.data.value = cloneDeep(data)
 
-                skipWatch = true
+                skipWatch.value = true
             }
 
             withdrawal.onRevoke(update)
@@ -162,7 +161,15 @@ export default defineComponent({
             },
             selectComponent: canvasPanel.select,
             noSelectComponent: canvasPanel.noSelect,
-            initComponentStyle
+            initComponentStyle,
+            // 禁用输入框默认的回撤功能
+            disableKeydownEventDefaultWithdrawal (e: KeyboardEvent) {
+                const isZ = e.key === 'z'
+
+                if (e.metaKey && isZ) {
+                    e.preventDefault()
+                }
+            }
         }
     }
 })

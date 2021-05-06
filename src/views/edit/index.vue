@@ -52,12 +52,15 @@
                 v-model:value="item.value"
                 class="input"
                 type="text"
+                @keydown="disableKeydownEventDefaultWithdrawal"
             />
 
-            <a-input-number
+            <a-input
                 v-if="item.type === inputType.number"
                 v-model:value="item.value"
+                type="number"
                 class="input"
+                @keydown="disableKeydownEventDefaultWithdrawal"
             />
         </div>
     </div>
