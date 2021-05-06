@@ -32,8 +32,10 @@ export function createWithdrawal<T> () {
 
         if (e.metaKey && isZ) {
             if (e.shiftKey) {
+                console.log('callRestore')
                 callRestore()
             } else {
+                console.log('callRevoke')
                 callRevoke()
             }
         }
