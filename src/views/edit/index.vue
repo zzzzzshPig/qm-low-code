@@ -1,5 +1,12 @@
 <template>
     <div class="main">
+        <a-button
+            type="primary"
+            class="btn-save"
+        >
+            保存
+        </a-button>
+
         <div class="component-list">
             <div
                 v-for="item in componentList"
@@ -67,6 +74,12 @@
 </template>
 
 <style scoped lang="less">
+    .btn-save {
+        position: absolute;
+        top: 16px;
+        right: 316px;
+    }
+
     .main {
         .relative;
         min-width: 1200px;

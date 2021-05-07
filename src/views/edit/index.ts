@@ -5,6 +5,7 @@ import { componentList, createWithdrawal } from './helper'
 import { ComponentName } from '@/views/edit/components/const'
 import { EditComponent } from '@/views/edit/types'
 import { cloneDeep } from 'lodash'
+import { useRoute } from 'vue-router'
 
 const components = ref<EditComponent[]>([])
 
@@ -18,15 +19,15 @@ function getComponentById (id: EditComponent['id']) {
 
 function useCanvasPanel () {
     const data = components
-
-    let id = 0
+    const id = Number(useRoute().params.id)
+    let uid = 0
 
     function render<T extends MyProps<T>> (item: MyComponentConfig) {
         const props = reactive(initProps(item))
 
         const component: EditComponent = {
             name: item.name,
-            id: ++id,
+            id: ++uid,
             props: props,
             select: false
         }
@@ -35,9 +36,6 @@ function useCanvasPanel () {
     }
 
     function getData () {
-        // 模拟获取保存的数据
-        const id = 123
-
         function getDataById (): EditComponent[] {
             if (id) {
                 return []
