@@ -102,6 +102,25 @@ function usePropPanel () {
     }
 }
 
+// 禁止浏览器默认的回撤行为
+function disableBrowserDefaultWithdrawal () {
+    function fn (e: KeyboardEvent) {
+        const isZ = e.key === 'z'
+
+        if (e.metaKey && isZ) {
+            e.preventDefault()
+        }
+    }
+
+    window.addEventListener('keydown', fn)
+
+    onUnmounted(() => {
+        window.removeEventListener('keydown', fn)
+    })
+
+    return fn
+}
+
 export default defineComponent({
     components: (() => {
         const res: Record<ComponentName, MyComponentConfig> = {} as never
@@ -150,6 +169,8 @@ export default defineComponent({
 
         watchComponents()
 
+        disableBrowserDefaultWithdrawal()
+
         return {
             componentList,
             inputType: propPanel.inputType,
@@ -161,15 +182,7 @@ export default defineComponent({
             },
             selectComponent: canvasPanel.select,
             noSelectComponent: canvasPanel.noSelect,
-            initComponentStyle,
-            // 禁用输入框默认的回撤功能
-            disableKeydownEventDefaultWithdrawal (e: KeyboardEvent) {
-                const isZ = e.key === 'z'
-
-                if (e.metaKey && isZ) {
-                    e.preventDefault()
-                }
-            }
+            initComponentStyle
         }
     }
 })

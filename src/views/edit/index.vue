@@ -1,72 +1,78 @@
 <template>
-    <div class="component-list">
-        <div
-            v-for="item in componentList"
-            :key="item.name"
-            class="item"
-            @click="addComponent(item)"
-        >
-            <img
-                :src="item.image"
-                alt=""
+    <div class="main">
+        <div class="component-list">
+            <div
+                v-for="item in componentList"
+                :key="item.name"
+                class="item"
+                @click="addComponent(item)"
             >
+                <img
+                    :src="item.image"
+                    alt=""
+                >
 
-            <div class="label">
-                {{ item.label }}
+                <div class="label">
+                    {{ item.label }}
+                </div>
             </div>
         </div>
-    </div>
 
-    <div
-        class="canvas"
-        @click="noSelectComponent"
-    >
-        <component
-            :is="item.name"
-            v-for="item in components"
-            :key="item.id"
-            :class="{
-                select: item.select
-            }"
-            :style="initComponentStyle(item.props)"
-            v-bind="item.props"
-            @click.stop="selectComponent(item)"
-        />
-    </div>
-
-    <div
-        v-if="propList"
-        class="prop-list"
-    >
         <div
-            v-for="(item, key) in propList"
-            :key="key"
-            class="item"
+            class="canvas"
+            @click="noSelectComponent"
         >
-            <div class="label">
-                {{ item.label }}：
+            <component
+                :is="item.name"
+                v-for="item in components"
+                :key="item.id"
+                :class="{
+                    select: item.select
+                }"
+                :style="initComponentStyle(item.props)"
+                v-bind="item.props"
+                @click.stop="selectComponent(item)"
+            />
+        </div>
+
+        <div
+            v-if="propList"
+            class="prop-list"
+        >
+            <div
+                v-for="(item, key) in propList"
+                :key="key"
+                class="item"
+            >
+                <div class="label">
+                    {{ item.label }}：
+                </div>
+
+                <a-input
+                    v-if="item.type === inputType.string"
+                    v-model:value="item.value"
+                    class="input"
+                    type="text"
+                />
+
+                <a-input
+                    v-if="item.type === inputType.number"
+                    v-model:value="item.value"
+                    type="number"
+                    class="input"
+                />
             </div>
-
-            <a-input
-                v-if="item.type === inputType.string"
-                v-model:value="item.value"
-                class="input"
-                type="text"
-                @keydown="disableKeydownEventDefaultWithdrawal"
-            />
-
-            <a-input
-                v-if="item.type === inputType.number"
-                v-model:value="item.value"
-                type="number"
-                class="input"
-                @keydown="disableKeydownEventDefaultWithdrawal"
-            />
         </div>
     </div>
 </template>
 
 <style scoped lang="less">
+    .main {
+        .relative;
+        min-width: 1200px;
+        height: 100%;
+    }
+
     .canvas {
         overflow: hidden;
         position: absolute;
