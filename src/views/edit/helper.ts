@@ -31,6 +31,8 @@ export function createWithdrawal<T> () {
         const isZ = e.key === 'z'
 
         if (e.metaKey && isZ) {
+            e.preventDefault()
+
             if (e.shiftKey) {
                 console.log('callRestore')
                 callRestore()
