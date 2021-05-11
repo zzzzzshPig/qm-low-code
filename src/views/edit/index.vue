@@ -3,6 +3,7 @@
         <a-button
             type="primary"
             class="btn-save"
+            @click="save"
         >
             保存
         </a-button>

@@ -6,6 +6,7 @@ import { ComponentName } from '@/views/edit/components/const'
 import { EditComponent } from '@/views/edit/types'
 import { cloneDeep } from 'lodash'
 import { useRoute } from 'vue-router'
+import { apiEdit } from '@/apis/edit'
 
 const components = ref<EditComponent[]>([])
 
@@ -35,24 +36,25 @@ function useCanvasPanel () {
         return component
     }
 
-    function getData () {
-        function getDataById (): EditComponent[] {
-            if (id) {
-                return []
-            }
+    async function saveData () {
+        await apiEdit.saveData({
+            id,
+            data: data.value
+        })
+    }
 
-            return []
-        }
+    async function getData () {
+        const { data: res } = await apiEdit.getData({
+            id
+        })
 
-        data.value = getDataById()
+        data.value = res
     }
     getData()
 
     function insert (component: EditComponent) {
         data.value.push(component)
     }
-
-    let lastComponentId: EditComponent['id']
 
     function select (component: EditComponent) {
         if (component.select) {
@@ -61,15 +63,15 @@ function useCanvasPanel () {
 
         noSelect()
 
-        lastComponentId = component.id
         component.select = true
     }
 
     function noSelect () {
-        const lastComponent = getComponentById(lastComponentId)
-
-        if (lastComponent) {
-            lastComponent.select = false
+        for (const a of components.value) {
+            if (a.select) {
+                a.select = false
+                break
+            }
         }
     }
 
@@ -78,7 +80,8 @@ function useCanvasPanel () {
         select,
         noSelect,
         insert,
-        render
+        render,
+        saveData
     }
 }
 
@@ -123,8 +126,6 @@ export default defineComponent({
         const skipWatch = ref(false)
 
         function watchComponents () {
-            withdrawal.push(cloneDeep(canvasPanel.data.value), 0)
-
             watch(canvasPanel.data, () => {
                 if (skipWatch.value) {
                     skipWatch.value = false
@@ -149,6 +150,7 @@ export default defineComponent({
         watchComponents()
 
         return {
+            save: canvasPanel.saveData,
             componentList,
             inputType: propPanel.inputType,
             propList: propPanel.data,
