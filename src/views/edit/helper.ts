@@ -1,12 +1,16 @@
-import Image from './components/image/index.vue'
-import { MyComponentConfig } from '@/views/edit/components/helper'
-import { GetPropsType, MyProps, PropValue } from '@/views/edit/components/type'
+import { MyComponentConfig, MyProps, PropValue, BasePropsType, Image } from 'qm-lowCode-component'
 import { useDebounce } from '@/utils'
+import { reactive } from 'vue'
+import { MyParams } from '@/views/edit/types'
 
 // eslint-disable-next-line
 export const componentList: MyComponentConfig[] = [Image] as any
 
-export function convertProps<T extends MyProps<T>> (props: T) {
+export function initProps<T extends MyProps<T>> (component: MyComponentConfig<T>) {
+    return reactive(convertProps(component.props))
+}
+
+function convertProps<T extends MyProps<T>> (props: T) {
     const res = new Map<keyof T, PropValue>()
     const keys = Reflect.ownKeys(props) as (keyof T)[]
 
@@ -15,9 +19,21 @@ export function convertProps<T extends MyProps<T>> (props: T) {
         res.set(a, prop.default())
     })
 
-    return Object.fromEntries(res.entries()) as GetPropsType<T>
+    return Object.fromEntries(res.entries()) as MyParams<T>
 }
 
+// 生成传入组件的基础props
+export function initComponentStyle (params: MyParams<BasePropsType>) {
+    return {
+        position: 'absolute',
+        left: `${params.x.value}px`,
+        top: `${params.y.value}px`,
+        width: `${params.width.value}px`,
+        height: `${params.height.value}px`
+    }
+}
+
+// 撤销与回撤功能
 export function createWithdrawal<T> () {
     const queue: Array<T> = []
     // 保存记录的最大深度

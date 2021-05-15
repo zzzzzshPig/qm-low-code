@@ -1,6 +1,5 @@
-import { MyDefineComponent, stringProp } from '@/views/edit/components/helper'
-import image from '@/views/edit/components/image/image.svg'
-import { ComponentName } from '@/views/edit/components/const'
+import { MyDefineComponent, stringProp, ComponentName } from '../helper'
+import image from './image.svg'
 
 export default MyDefineComponent({
     name: ComponentName.Image,

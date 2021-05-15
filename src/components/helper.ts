@@ -1,24 +1,13 @@
-import { ComponentName } from '@/views/edit/components/const'
-import { GetPropsType, MyProps } from '@/views/edit/components/type'
-import { defineComponent, SetupContext } from 'vue'
-import { convertProps } from '@/views/edit/helper'
+import { MyComponentConfig, MyProps, ParamType } from './'
+import { defineComponent } from 'vue'
 
-export type MyComponentConfig<T extends MyProps<T> = Record<string, never>> = {
-    label: string
-    props: T
-    image: string
-    name: ComponentName
-    emits?: string[]
-    setup: (this: void, props: GetPropsType<T & ReturnType<typeof baseProps>>, ctx: SetupContext) => void
+export enum ComponentName {
+    Image = 'image-component'
 }
+
 export function MyDefineComponent<T extends MyProps<T>> (config: MyComponentConfig<T>): MyComponentConfig<T> {
     // eslint-disable-next-line
     return defineComponent(config as any) as any
-}
-
-export enum ParamType {
-    string,
-    number
 }
 
 export function numberProp (label = '', value = 0) {
@@ -56,26 +45,9 @@ export function baseProps () {
     }
 }
 
-type InitParams = GetPropsType<ReturnType<typeof baseProps>>
-
 export function initProps<T extends MyProps<T>> (component: MyComponentConfig<T>) {
-    const props = {
+    component.props = {
         ...baseProps(),
         ...component.props
-    }
-
-    component.props = props
-
-    return convertProps(props)
-}
-
-// 生成组件的基础属性
-export function initComponentStyle (params: InitParams) {
-    return {
-        position: 'absolute',
-        left: `${params.x.value}px`,
-        top: `${params.y.value}px`,
-        width: `${params.width.value}px`,
-        height: `${params.height.value}px`
     }
 }

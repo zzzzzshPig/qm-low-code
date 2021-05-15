@@ -17,6 +17,9 @@
     "paths": {
       "@/*": [
         "src/*"
+      ],
+      "qm-lowCode-component": [
+        "src/components/index.ts"
       ]
     },
     "lib": [

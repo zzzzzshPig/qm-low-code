@@ -1,8 +1,6 @@
-import { defineComponent, onUnmounted, reactive, ref, watch, computed } from 'vue'
-import { MyProps } from '@/views/edit/components/type'
-import { initComponentStyle, initProps, MyComponentConfig, ParamType } from '@/views/edit/components/helper'
-import { componentList, createWithdrawal } from './helper'
-import { ComponentName } from '@/views/edit/components/const'
+import { defineComponent, onUnmounted, ref, watch, computed } from 'vue'
+import { MyProps, MyComponentConfig, ParamType } from 'qm-lowCode-component'
+import { componentList, createWithdrawal, initComponentStyle, initProps } from './helper'
 import { EditComponent } from '@/views/edit/types'
 import { cloneDeep } from 'lodash'
 import { useRoute } from 'vue-router'
@@ -10,13 +8,13 @@ import { apiEdit } from '@/apis/edit'
 
 const components = ref<EditComponent[]>([])
 
-function getComponentById (id: EditComponent['id']) {
-    for (const a of components.value) {
-        if (a.id === id) {
-            return a
-        }
-    }
-}
+// function getComponentById (id: EditComponent['id']) {
+//     for (const a of components.value) {
+//         if (a.id === id) {
+//             return a
+//         }
+//     }
+// }
 
 function useCanvasPanel () {
     const data = components
@@ -24,7 +22,7 @@ function useCanvasPanel () {
     let uid = 0
 
     function render<T extends MyProps<T>> (item: MyComponentConfig) {
-        const props = reactive(initProps(item))
+        const props = initProps(item)
 
         const component: EditComponent = {
             name: item.name,
@@ -105,7 +103,7 @@ function usePropPanel () {
 
 export default defineComponent({
     components: (() => {
-        const res: Record<ComponentName, MyComponentConfig> = {} as never
+        const res: Record<string, MyComponentConfig> = {} as never
 
         componentList.forEach(a => {
             res[a.name] = a
@@ -161,7 +159,7 @@ export default defineComponent({
             },
             selectComponent: canvasPanel.select,
             noSelectComponent: canvasPanel.noSelect,
-            initComponentStyle
+            initComponentStyle: initComponentStyle
         }
     }
 })

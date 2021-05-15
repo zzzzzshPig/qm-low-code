@@ -1,5 +1,6 @@
-import { MyComponentConfig } from '@/views/edit/components/helper'
-import { MyParams } from '@/views/edit/components/type'
+import { MyComponentConfig, GetPropsType, MyProps } from 'qm-lowCode-component'
+
+export type MyParams<T> = GetPropsType<MyProps<T>>
 
 export type EditComponent = {
     name: MyComponentConfig['name']
