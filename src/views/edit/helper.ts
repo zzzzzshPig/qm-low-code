@@ -29,7 +29,15 @@ export function initComponentStyle (params: MyParams<BasePropsType>) {
         left: `${params.x.value}px`,
         top: `${params.y.value}px`,
         width: `${params.width.value}px`,
-        height: `${params.height.value}px`
+        height: `${params.height.value}px`,
+        color: params.color.value,
+        backgroundColor: params.backgroundColor.value,
+        fontSize: `${params.fontSize.value}px`,
+        fontWeight: params.fontWeight.value,
+        borderRadius: `${params.borderRadius.value}px`,
+        borderColor: params.borderColor.value,
+        borderWidth: `${params.borderWidth.value}px`,
+        borderStyle: params.borderStyle.value
     }
 }
 

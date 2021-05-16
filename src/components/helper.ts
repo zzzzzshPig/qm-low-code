@@ -40,8 +40,16 @@ export function baseProps () {
     return {
         width: numberProp('宽度', 100),
         height: numberProp('高度', 100),
-        x: numberProp('水平位置', 0),
-        y: numberProp('垂直位置', 0)
+        x: numberProp('水平位置'),
+        y: numberProp('垂直位置'),
+        color: stringProp('文字颜色'),
+        backgroundColor: stringProp('背景颜色'),
+        fontSize: numberProp('文字大小', 16),
+        fontWeight: numberProp('文字粗细', 400),
+        borderRadius: numberProp('边框圆角'),
+        borderWidth: numberProp('边框大小'),
+        borderColor: stringProp('边框颜色'),
+        borderStyle: stringProp('边框样式', 'solid')
     }
 }
 
