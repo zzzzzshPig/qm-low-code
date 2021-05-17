@@ -1,4 +1,4 @@
-import { MyComponentConfig, MyProps, PropValue, BasePropsType, Image } from 'qm-lowCode-component'
+import { MyComponentConfig, MyProps, PropValue, BasePropsType, Image, ParamType } from 'qm-lowCode-component'
 import { useDebounce } from '@/utils'
 import { reactive } from 'vue'
 import { MyParams } from '@/views/edit/types'

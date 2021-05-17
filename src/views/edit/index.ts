@@ -24,14 +24,16 @@ const selectComponent = computed<EditComponent | undefined>(() => {
 function useCanvasPanel () {
     const data = components
     const id = Number(useRoute().params.id)
-    let uid = 0
+    const uid = computed(() => {
+        return components.value[components.value.length - 1].id + 1
+    })
 
     function render<T extends MyProps<T>> (item: MyComponentConfig) {
         const props = initProps(item)
 
         const component: EditComponent = {
             name: item.name,
-            id: ++uid,
+            id: uid.value,
             props: props
         }
 
@@ -160,7 +162,7 @@ export default defineComponent({
             },
             select: canvasPanel.select,
             noSelect: canvasPanel.noSelect,
-            initComponentStyle: initComponentStyle,
+            initComponentStyle,
             selectComponent,
             cmtSelectStyle: canvasPanel.cmtSelectStyle
         }

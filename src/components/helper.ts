@@ -45,11 +45,11 @@ export function baseProps () {
         color: stringProp('文字颜色'),
         backgroundColor: stringProp('背景颜色'),
         fontSize: numberProp('文字大小', 16),
-        fontWeight: numberProp('文字粗细', 400),
+        fontWeight: stringProp('文字粗细'),
         borderRadius: numberProp('边框圆角'),
         borderWidth: numberProp('边框大小'),
         borderColor: stringProp('边框颜色'),
-        borderStyle: stringProp('边框样式', 'solid')
+        borderStyle: stringProp('边框样式')
     }
 }
 
