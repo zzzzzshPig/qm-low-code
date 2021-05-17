@@ -6,5 +6,4 @@ export type EditComponent = {
     name: MyComponentConfig['name']
     id: number
     props: MyParams<unknown>
-    select: boolean
 }

@@ -1,5 +1,5 @@
 import { defineComponent, onUnmounted, ref, watch, computed } from 'vue'
-import { MyProps, MyComponentConfig, ParamType } from 'qm-lowCode-component'
+import { MyProps, MyComponentConfig, ParamType, BasePropsType } from 'qm-lowCode-component'
 import { componentList, createWithdrawal, initComponentStyle, initProps } from './helper'
 import { EditComponent } from '@/views/edit/types'
 import { cloneDeep } from 'lodash'
@@ -16,6 +16,11 @@ const components = ref<EditComponent[]>([])
 //     }
 // }
 
+const selectComponentId = ref<number>()
+const selectComponent = computed<EditComponent | undefined>(() => {
+    return components.value.filter(a => a.id === selectComponentId.value)[0]
+})
+
 function useCanvasPanel () {
     const data = components
     const id = Number(useRoute().params.id)
@@ -27,8 +32,7 @@ function useCanvasPanel () {
         const component: EditComponent = {
             name: item.name,
             id: ++uid,
-            props: props,
-            select: false
+            props: props
         }
 
         return component
@@ -55,23 +59,29 @@ function useCanvasPanel () {
     }
 
     function select (component: EditComponent) {
-        if (component.select) {
-            return
-        }
-
-        noSelect()
-
-        component.select = true
+        selectComponentId.value = component.id
     }
 
     function noSelect () {
-        for (const a of components.value) {
-            if (a.select) {
-                a.select = false
-                break
-            }
-        }
+        selectComponentId.value = undefined
     }
+
+    const cmtSelectStyle = computed(() => {
+        if (!selectComponent.value) {
+            return
+        }
+
+        const padding = 16
+        const halfPadding = padding / 2
+        const props = selectComponent.value.props as BasePropsType
+
+        return {
+            width: `${props.width.value + padding}px`,
+            height: `${props.height.value + padding}px`,
+            top: `${props.top.value - halfPadding}px`,
+            left: `${props.left.value - halfPadding}px`
+        }
+    })
 
     return {
         data,
@@ -79,24 +89,16 @@ function useCanvasPanel () {
         noSelect,
         insert,
         render,
-        saveData
+        saveData,
+        cmtSelectStyle
     }
 }
 
 // 属性面板相关
 function usePropPanel () {
-    // 显示被选中的元素的props
-    const data = computed(() => {
-        const component = components.value.filter(a => a.select)[0]
-
-        if (!component) return undefined
-
-        return component.props
-    })
     const inputType = ParamType
 
     return {
-        data,
         inputType
     }
 }
@@ -151,15 +153,16 @@ export default defineComponent({
             save: canvasPanel.saveData,
             componentList,
             inputType: propPanel.inputType,
-            propList: propPanel.data,
             components: canvasPanel.data,
             addComponent (item: MyComponentConfig) {
                 const component = canvasPanel.render(item)
                 canvasPanel.insert(component)
             },
-            selectComponent: canvasPanel.select,
-            noSelectComponent: canvasPanel.noSelect,
-            initComponentStyle: initComponentStyle
+            select: canvasPanel.select,
+            noSelect: canvasPanel.noSelect,
+            initComponentStyle: initComponentStyle,
+            selectComponent,
+            cmtSelectStyle: canvasPanel.cmtSelectStyle
         }
     }
 })

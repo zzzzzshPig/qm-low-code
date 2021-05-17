@@ -40,8 +40,8 @@ export function baseProps () {
     return {
         width: numberProp('宽度', 100),
         height: numberProp('高度', 100),
-        x: numberProp('水平位置'),
-        y: numberProp('垂直位置'),
+        left: numberProp('水平位置'),
+        top: numberProp('垂直位置'),
         color: stringProp('文字颜色'),
         backgroundColor: stringProp('背景颜色'),
         fontSize: numberProp('文字大小', 16),

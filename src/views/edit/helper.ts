@@ -23,21 +23,21 @@ function convertProps<T extends MyProps<T>> (props: T) {
 }
 
 // 生成传入组件的基础props
-export function initComponentStyle (params: MyParams<BasePropsType>) {
+export function initComponentStyle (props: BasePropsType) {
     return {
         position: 'absolute',
-        left: `${params.x.value}px`,
-        top: `${params.y.value}px`,
-        width: `${params.width.value}px`,
-        height: `${params.height.value}px`,
-        color: params.color.value,
-        backgroundColor: params.backgroundColor.value,
-        fontSize: `${params.fontSize.value}px`,
-        fontWeight: params.fontWeight.value,
-        borderRadius: `${params.borderRadius.value}px`,
-        borderColor: params.borderColor.value,
-        borderWidth: `${params.borderWidth.value}px`,
-        borderStyle: params.borderStyle.value
+        left: `${props.left.value}px`,
+        top: `${props.top.value}px`,
+        width: `${props.width.value}px`,
+        height: `${props.height.value}px`,
+        color: props.color.value,
+        backgroundColor: props.backgroundColor.value,
+        fontSize: `${props.fontSize.value}px`,
+        fontWeight: props.fontWeight.value,
+        borderRadius: `${props.borderRadius.value}px`,
+        borderColor: props.borderColor.value,
+        borderWidth: `${props.borderWidth.value}px`,
+        borderStyle: props.borderStyle.value
     }
 }
 

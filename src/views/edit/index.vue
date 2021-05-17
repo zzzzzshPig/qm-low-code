@@ -28,27 +28,30 @@
 
         <div
             class="canvas"
-            @click="noSelectComponent"
+            @click="noSelect"
         >
             <component
                 :is="item.name"
                 v-for="item in components"
                 :key="item.id"
-                :class="{
-                    select: item.select
-                }"
                 :style="initComponentStyle(item.props)"
                 v-bind="item.props"
-                @click.stop="selectComponent(item)"
+                @click.stop="select(item)"
+            />
+
+            <div
+                v-if="selectComponent"
+                class="select"
+                :style="cmtSelectStyle"
             />
         </div>
 
         <div
-            v-if="propList"
+            v-if="selectComponent"
             class="prop-list"
         >
             <div
-                v-for="(item, key) in propList"
+                v-for="(item, key) in selectComponent.props"
                 :key="key"
                 class="item"
             >
@@ -98,7 +101,8 @@
         transform: translateX(-50%);
 
         .select {
-            box-shadow: 0 0 4px 0 #00b7ff;
+            position: absolute;
+            border: 2px solid #00b7ff;
             border-radius: 10%;
         }
     }
