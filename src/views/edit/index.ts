@@ -168,7 +168,7 @@ function useWithdrawal () {
     const skipWatch = ref(false)
 
     function watchComponents () {
-        watch(components.value, () => {
+        watch(components, () => {
             if (skipWatch.value) {
                 skipWatch.value = false
                 return
