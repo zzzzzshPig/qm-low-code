@@ -15,9 +15,3 @@ export function useDebounce () {
         apply
     }
 }
-
-export function sleep (ms: number) {
-    return new Promise(resolve => {
-        setTimeout(resolve, ms)
-    })
-}

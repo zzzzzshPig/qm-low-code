@@ -28,7 +28,7 @@
 
         <div
             class="canvas"
-            @click="noSelect"
+            @click="select.noSelect"
         >
             <component
                 :is="item.name"
@@ -36,22 +36,22 @@
                 :key="item.id"
                 :style="initComponentStyle(item.props)"
                 v-bind="item.props"
-                @click.stop="select(item)"
+                @click.stop="select.select(item)"
             />
 
             <div
-                v-if="selectComponent"
+                v-if="select.selectComponent"
                 class="select"
-                :style="cmtSelectStyle"
+                :style="select.cmtSelectStyle"
             />
         </div>
 
         <div
-            v-if="selectComponent"
+            v-if="select.selectComponent"
             class="prop-list"
         >
             <div
-                v-for="(item, key) in selectComponent.props"
+                v-for="(item, key) in select.selectComponent.props"
                 :key="key"
                 class="item"
             >
@@ -72,6 +72,41 @@
                     type="number"
                     class="input"
                 />
+
+                <div
+                    v-if="item.type === inputType.color"
+                    class="input-color"
+                    @click.stop
+                >
+                    <div
+                        class="box"
+                        :style="{
+                            backgroundColor: item.value
+                        }"
+                        @click="colorPicker.show(key)"
+                    />
+
+                    <color-picker
+                        v-if="colorPicker.canShowItem(key)"
+                        class="picker"
+                        style="width: 220px"
+                        :color="item.value"
+                        @changeColor="colorPicker.change($event, item)"
+                    />
+                </div>
+
+                <a-select
+                    v-if="item.type === inputType.select"
+                    v-model:value="item.value"
+                >
+                    <a-select-option
+                        v-for="s in item.list"
+                        :key="s.value"
+                        :value="s.value"
+                    >
+                        {{ s.label }}
+                    </a-select-option>
+                </a-select>
             </div>
         </div>
     </div>
@@ -103,7 +138,6 @@
         .select {
             position: absolute;
             border: 2px solid #00b7ff;
-            border-radius: 10%;
         }
     }
 
@@ -156,6 +190,24 @@
             .input {
                 flex: 1;
                 height: 32px;
+            }
+
+            .input-color {
+                .relative;
+                margin-top: 4px;
+
+                .box {
+                    width: 60px;
+                    height: 24px;
+                    border: 1px solid rgba(0, 0, 0, .2);
+                }
+
+                .picker {
+                    z-index: 99;
+                    position: absolute;
+                    top: 32px;
+                    right: -74px;
+                }
             }
         }
     }

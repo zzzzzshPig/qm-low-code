@@ -24,6 +24,8 @@ function convertProps<T extends MyProps<T>> (props: T) {
 
 // 生成传入组件的基础props
 export function initComponentStyle (props: BasePropsType) {
+    console.log(props)
+
     return {
         position: 'absolute',
         left: `${props.left.value}px`,

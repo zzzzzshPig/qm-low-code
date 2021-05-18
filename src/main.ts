@@ -5,8 +5,9 @@ import store from './store'
 import loadAntComponent from '@/utils/load-ant-components'
 
 const app = createApp(App)
+
 app.use(store)
-app.use(router)
+    .use(router)
 
 loadAntComponent(app)
 

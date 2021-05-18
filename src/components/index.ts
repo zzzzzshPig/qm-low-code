@@ -14,7 +14,9 @@ export const Image = ImageC
 
 export enum ParamType {
     string,
-    number
+    number,
+    color,
+    select
 }
 
 export type PropValue = {

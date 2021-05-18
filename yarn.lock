@@ -9233,6 +9233,11 @@ vue-cli-plugin-style-resources-loader@~0.1.5:
   resolved "https://registry.npm.taobao.org/vue-cli-plugin-style-resources-loader/download/vue-cli-plugin-style-resources-loader-0.1.5.tgz#3e95f4df41f5408e1255664690698c0533648109"
   integrity sha1-PpX030H1QI4SVWZGkGmMBTNkgQk=
 
+vue-color-kit@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.nlark.com/vue-color-kit/download/vue-color-kit-1.0.3.tgz#cfe4272d02e18f35f95d05a841690279ca0f72d0"
+  integrity sha1-z+QnLQLhjzX5XQWoQWkCecoPctA=
+
 vue-eslint-parser@^7.0.0, vue-eslint-parser@^7.6.0:
   version "7.6.0"
   resolved "https://registry.npm.taobao.org/vue-eslint-parser/download/vue-eslint-parser-7.6.0.tgz?cache=0&sync_timestamp=1614679548045&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fvue-eslint-parser%2Fdownload%2Fvue-eslint-parser-7.6.0.tgz#01ea1a2932f581ff244336565d712801f8f72561"
