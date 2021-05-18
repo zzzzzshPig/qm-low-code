@@ -13,7 +13,9 @@
                 v-for="item in componentList"
                 :key="item.name"
                 class="item"
-                @click="addComponent(item)"
+                draggable="true"
+                @dragstart="drag.start(item)"
+                @dragend="drag.restore"
             >
                 <img
                     :src="item.image"
@@ -28,21 +30,26 @@
 
         <div
             class="canvas"
+            @drop="drag.end"
+            @dragover.prevent
+            @mousemove="drag.move"
             @click="select.noSelect"
         >
-            <component
-                :is="item.name"
-                v-for="item in components"
-                :key="item.id"
-                :style="initComponentStyle(item.props)"
-                v-bind="item.props"
-                @click.stop="select.select(item)"
-            />
-
             <div
                 v-if="select.selectComponent"
                 class="select"
                 :style="select.cmtSelectStyle"
+            />
+
+            <component
+                :is="item.name"
+                v-for="item in components"
+                :key="item.id"
+                draggable="false"
+                :style="initComponentStyle(item.props)"
+                v-bind="item.props"
+                @mousedown="drag.moveStart($event, item)"
+                @click.stop="select.select(item)"
             />
         </div>
 

@@ -1,13 +1,12 @@
-import { MyComponentConfig, MyProps, PropValue, BasePropsType, Image, ParamType } from 'qm-lowCode-component'
+import { MyComponentConfig, MyProps, PropValue, BasePropsType, Image } from 'qm-lowCode-component'
 import { useDebounce } from '@/utils'
 import { reactive } from 'vue'
-import { MyParams } from '@/views/edit/types'
 
 // eslint-disable-next-line
 export const componentList: MyComponentConfig[] = [Image] as any
 
-export function initProps<T extends MyProps<T>> (component: MyComponentConfig<T>) {
-    return reactive(convertProps(component.props))
+export function initProps (component: MyComponentConfig) {
+    return reactive(convertProps(component.props)) as BasePropsType
 }
 
 function convertProps<T extends MyProps<T>> (props: T) {
@@ -19,13 +18,11 @@ function convertProps<T extends MyProps<T>> (props: T) {
         res.set(a, prop.default())
     })
 
-    return Object.fromEntries(res.entries()) as MyParams<T>
+    return Object.fromEntries(res.entries()) as BasePropsType
 }
 
 // 生成传入组件的基础props
 export function initComponentStyle (props: BasePropsType) {
-    console.log(props)
-
     return {
         position: 'absolute',
         left: `${props.left.value}px`,

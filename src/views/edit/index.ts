@@ -19,6 +19,106 @@ const components = ref<EditComponent[]>([])
 //     }
 // }
 
+// component
+function useComponent () {
+    const uid = computed(() => {
+        const lastComponent = components.value[components.value.length - 1]
+
+        if (!lastComponent) return 1
+
+        return lastComponent.id + 1
+    })
+
+    function render<T extends MyProps<T>> (item: MyComponentConfig) {
+        const props = initProps(item)
+
+        const component: EditComponent = {
+            name: item.name,
+            id: uid.value,
+            props
+        }
+
+        return component
+    }
+
+    function insert (component: EditComponent) {
+        components.value.push(component)
+
+        return component
+    }
+
+    function addComponent (item: MyComponentConfig) {
+        return insert(render(item))
+    }
+
+    return {
+        addComponent
+    }
+}
+
+function useDrag (component: ReturnType<typeof useComponent>) {
+    let dragItem: null | MyComponentConfig = null
+
+    function start (item: MyComponentConfig) {
+        dragItem = item
+    }
+
+    function end (e: DragEvent) {
+        if (!dragItem) {
+            return
+        }
+
+        const c = component.addComponent(dragItem)
+        c.props.top.value = e.offsetY - c.props.height.value / 2
+        c.props.left.value = e.offsetX - c.props.width.value / 2
+    }
+
+    function restore () {
+        dragItem = null
+    }
+
+    let editComponent: null | EditComponent = null
+    let initTop = 0
+    let initLeft = 0
+
+    function move (e: MouseEvent) {
+        if (!editComponent) {
+            return
+        }
+
+        const nowTop = e.clientY
+        const nowLeft = e.clientX
+
+        editComponent.props.top.value += nowTop - initTop
+        editComponent.props.left.value += nowLeft - initLeft
+
+        initTop = nowTop
+        initLeft = nowLeft
+    }
+
+    function moveStart (e: MouseEvent, item: EditComponent) {
+        initTop = e.clientY
+        initLeft = e.clientX
+        editComponent = item
+
+        document.addEventListener('mouseup', moveEnd)
+    }
+
+    function moveEnd () {
+        editComponent = null
+
+        document.removeEventListener('mouseup', moveEnd)
+    }
+
+    return {
+        start,
+        end,
+        move,
+        restore,
+        moveStart
+    }
+}
+
 function useSelect () {
     const selectComponentId = ref<number>()
 
@@ -63,25 +163,6 @@ function useSelect () {
 // canvas
 function useCanvasPanel () {
     const id = Number(useRoute().params.id)
-    const uid = computed(() => {
-        const lastComponent = components.value[components.value.length - 1]
-
-        if (!lastComponent) return 1
-
-        return lastComponent.id + 1
-    })
-
-    function render<T extends MyProps<T>> (item: MyComponentConfig) {
-        const props = initProps(item)
-
-        const component: EditComponent = {
-            name: item.name,
-            id: uid.value,
-            props: props
-        }
-
-        return component
-    }
 
     async function saveData () {
         await apiEdit.saveData({
@@ -101,13 +182,7 @@ function useCanvasPanel () {
     }
     getData()
 
-    function insert (component: EditComponent) {
-        components.value.push(component)
-    }
-
     return {
-        insert,
-        render,
         saveData
     }
 }
@@ -213,21 +288,20 @@ export default defineComponent({
         const propPanel = usePropPanel()
         const canvasPanel = useCanvasPanel()
         const colorPicker = useColorPicker()
+        const component = useComponent()
+        const drag = useDrag(component)
 
         useWithdrawal()
 
         return {
+            drag,
             select,
             colorPicker,
             components,
             componentList,
             initComponentStyle,
             save: canvasPanel.saveData,
-            inputType: propPanel.inputType,
-            addComponent (item: MyComponentConfig) {
-                const component = canvasPanel.render(item)
-                canvasPanel.insert(component)
-            }
+            inputType: propPanel.inputType
         }
     }
 })
