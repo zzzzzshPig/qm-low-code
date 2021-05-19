@@ -45,6 +45,7 @@
                 :is="item.name"
                 v-for="item in components"
                 :key="item.id"
+                class="component"
                 draggable="false"
                 :style="initComponentStyle(item.props)"
                 v-bind="item.props"
@@ -146,14 +147,21 @@
         transform: translateX(-50%);
         box-sizing: content-box;
 
+        .component {
+            cursor: pointer;
+        }
+
         .select {
             position: absolute;
+            padding: 4px;
             border: 2px solid #00b7ff;
+            box-sizing: content-box;
+            transform: translate(-6px, -6px);
         }
     }
 
     .component-list {
-        .flex-align-start-wrap;
+        .flex-align-start-wrap-justify-between;
         position: absolute;
         top: 0;
         left: 0;
@@ -164,8 +172,8 @@
 
         .item {
             .flex-align-center-justify-center-column;
-            width: 90px;
-            height: 90px;
+            width: 86px;
+            height: 86px;
             border: 1px solid rgba(0, 0, 0, .1);
             cursor: pointer;
             user-select: none;

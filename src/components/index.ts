@@ -1,9 +1,10 @@
 import { baseProps, ComponentName, initProps } from './helper'
 import ImageC from './image/index.vue'
+import TextC from './text/index.vue'
 import { SetupContext } from 'vue'
 
 // eslint-disable-next-line
-const component: MyComponentConfig<MyProps<any>>[] = [ImageC] as any
+const component: MyComponentConfig<MyProps<any>>[] = [ImageC, TextC] as any
 
 // 对所有组件添加基础props
 component.forEach(a => {
@@ -11,6 +12,8 @@ component.forEach(a => {
 })
 
 export const Image = ImageC
+
+export const Text = TextC
 
 export enum ParamType {
     string,

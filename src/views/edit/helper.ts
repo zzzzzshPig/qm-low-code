@@ -1,9 +1,47 @@
-import { MyComponentConfig, MyProps, PropValue, BasePropsType, Image } from 'qm-lowCode-component'
+import { MyComponentConfig, MyProps, PropValue, BasePropsType, Image, Text } from 'qm-lowCode-component'
 import { useDebounce } from '@/utils'
 import { onUnmounted, reactive } from 'vue'
 
+export function divisionNumberOrString (...args: Array<number | string>) {
+    let res = parseInt(args[0].toString())
+
+    args.shift()
+
+    args.forEach(a => {
+        res /= parseInt(a.toString())
+    })
+
+    return res
+}
+
+export function reduceNumberOrString (...args: Array<number | string>) {
+    let res = parseInt(args[0].toString())
+
+    args.shift()
+
+    args.forEach(a => {
+        res -= parseInt(a.toString())
+    })
+
+    return res
+}
+
+export function addNumberOrString (...args: Array<number | string>) {
+    let res = 0
+
+    args.forEach(a => {
+        res += parseInt(a.toString())
+    })
+
+    return res
+}
+
+export function numberToString (num: number, unit = 'px') {
+    return num + unit
+}
+
 // eslint-disable-next-line
-export const componentList: MyComponentConfig[] = [Image] as any
+export const componentList: MyComponentConfig[] = [Image, Text] as any
 
 export function initProps (component: MyComponentConfig) {
     return reactive(convertProps(component.props)) as BasePropsType
@@ -23,21 +61,16 @@ function convertProps<T extends MyProps<T>> (props: T) {
 
 // 生成传入组件的基础props
 export function initComponentStyle (props: BasePropsType) {
+    const keys = Reflect.ownKeys(props) as (keyof BasePropsType)[]
+    const res: Record<keyof BasePropsType, unknown> = {} as never
+
+    keys.forEach(a => {
+        res[a] = props[a].value
+    })
+
     return {
-        zIndex: props.zIndex.value,
         position: 'absolute',
-        left: `${props.left.value}px`,
-        top: `${props.top.value}px`,
-        width: `${props.width.value}px`,
-        height: `${props.height.value}px`,
-        color: props.color.value,
-        backgroundColor: props.backgroundColor.value,
-        fontSize: `${props.fontSize.value}px`,
-        fontWeight: props.fontWeight.value,
-        borderRadius: `${props.borderRadius.value}px`,
-        borderColor: props.borderColor.value,
-        borderWidth: `${props.borderWidth.value}px`,
-        borderStyle: props.borderStyle.value
+        ...res
     }
 }
 

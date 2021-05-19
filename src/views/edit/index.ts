@@ -1,6 +1,15 @@
 import { defineComponent, onUnmounted, ref, watch, computed, reactive, onMounted } from 'vue'
 import { MyProps, MyComponentConfig, ParamType, BasePropsType, PropValue } from 'qm-lowCode-component'
-import { componentList, createWithdrawal, initComponentStyle, initProps, registerKeydownEvent } from './helper'
+import {
+    addNumberOrString,
+    componentList,
+    createWithdrawal,
+    divisionNumberOrString,
+    initComponentStyle,
+    initProps,
+    numberToString, reduceNumberOrString,
+    registerKeydownEvent
+} from './helper'
 import { EditComponent } from '@/views/edit/types'
 import { cloneDeep } from 'lodash'
 import { useRoute } from 'vue-router'
@@ -81,8 +90,8 @@ function useDrag (component: UseComponent) {
         }
 
         const c = component.add(dragItem)
-        c.props.top.value = e.offsetY - c.props.height.value / 2
-        c.props.left.value = e.offsetX - c.props.width.value / 2
+        c.props.top.value = numberToString(reduceNumberOrString(e.offsetY, divisionNumberOrString(c.props.height.value, 2)))
+        c.props.left.value = numberToString(reduceNumberOrString(e.offsetX, divisionNumberOrString(c.props.width.value, 2)))
     }
 
     function restore () {
@@ -109,8 +118,8 @@ function useDrag (component: UseComponent) {
         const nowTop = e.clientY
         const nowLeft = e.clientX
 
-        editComponent.props.top.value += nowTop - initTop
-        editComponent.props.left.value += nowLeft - initLeft
+        editComponent.props.top.value = numberToString(addNumberOrString(editComponent.props.top.value, nowTop - initTop))
+        editComponent.props.left.value = numberToString(addNumberOrString(editComponent.props.left.value, nowLeft - initLeft))
 
         initTop = nowTop
         initLeft = nowLeft
@@ -151,17 +160,15 @@ function useSelect (component: UseComponent) {
             return
         }
 
-        const padding = 16
-        const halfPadding = padding / 2
         const props = selectComponent.value.props as BasePropsType
 
         return {
             zIndex: props.zIndex.value,
-            width: `${props.width.value + padding}px`,
-            height: `${props.height.value + padding}px`,
-            top: `${props.top.value - halfPadding}px`,
-            left: `${props.left.value - halfPadding}px`,
-            borderRadius: `${props.borderRadius.value}px`
+            width: props.width.value,
+            height: props.height.value,
+            top: props.top.value,
+            left: props.left.value,
+            borderRadius: props.borderRadius.value
         }
     })
 
@@ -186,13 +193,13 @@ function useSelect (component: UseComponent) {
         const props = selectComponent.value.props
 
         if (isArrowUp) {
-            props.top.value -= value
+            props.top.value = numberToString(reduceNumberOrString(props.top.value, value))
         } else if (isArrowDown) {
-            props.top.value += value
+            props.top.value = numberToString(addNumberOrString(props.top.value, value))
         } else if (isArrowLeft) {
-            props.left.value -= value
+            props.left.value = numberToString(reduceNumberOrString(props.left.value, value))
         } else if (isArrowRight) {
-            props.left.value += value
+            props.left.value = numberToString(addNumberOrString(props.left.value, value))
         } else if (isDel) {
             component.remove(selectComponent.value)
         }
@@ -247,8 +254,8 @@ function useColorPicker () {
         document.removeEventListener('click', hide)
     })
 
-    function change (value: { hex: string }, item: PropValue) {
-        item.value = value.hex
+    function change ({ rgba }: { rgba: { a: number, b: number, g: number, r: number} }, item: PropValue) {
+        item.value = `rgba(${rgba.r},${rgba.g},${rgba.b},${rgba.a})`
     }
 
     function show (index: number) {
@@ -335,18 +342,18 @@ export default defineComponent({
 
     setup () {
         const component = useComponent()
-        const select = useSelect(component)
         const propPanel = usePropPanel()
         const canvasPanel = useCanvasPanel()
         const colorPicker = useColorPicker()
         const drag = useDrag(component)
+        const select = useSelect(component)
 
         useWithdrawal()
 
         return {
-            propPanel,
             drag,
             select,
+            propPanel,
             colorPicker,
             components,
             componentList,

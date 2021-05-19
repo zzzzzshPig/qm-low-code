@@ -3,7 +3,8 @@ import { defineComponent } from 'vue'
 import { LabelValueArray } from '@/types'
 
 export enum ComponentName {
-    Image = 'image-component'
+    Image = 'image-component',
+    Text = 'text-component'
 }
 
 export function MyDefineComponent<T extends MyProps<T>> (config: MyComponentConfig<T>): MyComponentConfig<T> {
@@ -67,16 +68,13 @@ export function selectProp<T> (label = '', value: string | number, list: LabelVa
 export function baseProps () {
     return {
         zIndex: numberProp('层级'),
-        width: numberProp('宽度', 100),
-        height: numberProp('高度', 100),
-        left: numberProp('水平位置'),
-        top: numberProp('垂直位置'),
-        color: colorProp('文字颜色'),
+        width: stringProp('宽度', '100px'),
+        height: stringProp('高度', '100px'),
+        left: stringProp('水平位置', '0px'),
+        top: stringProp('垂直位置', '0px'),
         backgroundColor: colorProp('背景颜色'),
-        fontSize: numberProp('文字大小', 16),
-        fontWeight: stringProp('文字粗细'),
-        borderRadius: numberProp('边框圆角'),
-        borderWidth: numberProp('边框大小'),
+        borderRadius: stringProp('边框圆角', '0px'),
+        borderWidth: stringProp('边框大小', '0px'),
         borderColor: colorProp('边框颜色'),
         borderStyle: selectProp('边框样式', 'none', [
             {
