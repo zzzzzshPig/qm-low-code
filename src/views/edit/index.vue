@@ -1,9 +1,12 @@
 <template>
-    <div class="main">
+    <div
+        class="main"
+        @click="select.noSelect"
+    >
         <a-button
             type="primary"
             class="btn-save"
-            @click="save"
+            @click.stop="save"
         >
             保存
         </a-button>
@@ -29,11 +32,11 @@
         </div>
 
         <div
+            tabindex="-1"
             class="canvas"
             @drop="drag.end"
             @dragover.prevent
             @mousemove="drag.move"
-            @click="select.noSelect"
         >
             <div
                 v-if="select.selectComponent"
@@ -57,6 +60,7 @@
         <div
             v-if="select.selectComponent"
             class="prop-list"
+            @click.stop
         >
             <div
                 v-for="(item, key) in select.selectComponent.props"
@@ -85,7 +89,7 @@
                 <div
                     v-if="item.type === propPanel.type.color"
                     class="input-color"
-                    @click.stop
+                    @mousedown.stop
                 >
                     <div
                         class="box"
@@ -126,7 +130,7 @@
     .btn-save {
         position: absolute;
         top: 16px;
-        right: 316px;
+        right: 268px;
     }
 
     .main {
@@ -162,6 +166,7 @@
 
     .component-list {
         .flex-align-start-wrap-justify-between;
+        align-content: start;
         position: absolute;
         top: 0;
         left: 0;
@@ -174,6 +179,7 @@
             .flex-align-center-justify-center-column;
             width: 86px;
             height: 86px;
+            margin-bottom: 24px;
             border: 1px solid rgba(0, 0, 0, .1);
             cursor: pointer;
             user-select: none;

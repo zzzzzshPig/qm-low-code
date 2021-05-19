@@ -4,7 +4,8 @@ import { LabelValueArray } from '@/types'
 
 export enum ComponentName {
     Image = 'image-component',
-    Text = 'text-component'
+    Text = 'text-component',
+    Block = 'block-component'
 }
 
 export function MyDefineComponent<T extends MyProps<T>> (config: MyComponentConfig<T>): MyComponentConfig<T> {
@@ -31,6 +32,19 @@ export function stringProp (label = '', value = '') {
         default: () => {
             return {
                 type: ParamType.string,
+                label,
+                value
+            }
+        }
+    }
+}
+
+export function booleanProp (label = '', value = false) {
+    return {
+        type: Object,
+        default: () => {
+            return {
+                type: ParamType.boolean,
                 label,
                 value
             }

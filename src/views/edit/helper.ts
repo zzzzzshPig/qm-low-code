@@ -1,6 +1,18 @@
-import { MyComponentConfig, MyProps, PropValue, BasePropsType, Image, Text } from 'qm-lowCode-component'
+import { MyComponentConfig, MyProps, PropValue, BasePropsType, Image, Text, Block } from 'qm-lowCode-component'
 import { useDebounce } from '@/utils'
 import { onUnmounted, reactive } from 'vue'
+
+// eslint-disable-next-line
+export const componentList: MyComponentConfig[] = [Image, Text, Block] as any
+
+const isMacOs = navigator.platform.toLowerCase().includes('mac')
+
+export function isSaveKeydown (e: KeyboardEvent) {
+    const key = e.key.toLowerCase()
+    const handler = isMacOs ? e.metaKey : e.ctrlKey
+
+    return handler && key === 's'
+}
 
 export function divisionNumberOrString (...args: Array<number | string>) {
     let res = parseInt(args[0].toString())
@@ -40,9 +52,6 @@ export function numberToString (num: number, unit = 'px') {
     return num + unit
 }
 
-// eslint-disable-next-line
-export const componentList: MyComponentConfig[] = [Image, Text] as any
-
 export function initProps (component: MyComponentConfig) {
     return reactive(convertProps(component.props)) as BasePropsType
 }
@@ -74,11 +83,11 @@ export function initComponentStyle (props: BasePropsType) {
     }
 }
 
-export function registerKeydownEvent (fn: (e: KeyboardEvent) => void) {
-    window.addEventListener('keydown', fn)
+export function registerKeydownEvent (fn: (e: KeyboardEvent) => void, dom: HTMLElement | Window = window) {
+    dom.addEventListener('keydown', fn as never)
 
     onUnmounted(() => {
-        window.removeEventListener('keydown', fn)
+        dom.removeEventListener('keydown', fn as never)
     })
 }
 

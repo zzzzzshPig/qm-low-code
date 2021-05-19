@@ -7,7 +7,9 @@ import {
     divisionNumberOrString,
     initComponentStyle,
     initProps,
-    numberToString, reduceNumberOrString,
+    isSaveKeydown,
+    numberToString,
+    reduceNumberOrString,
     registerKeydownEvent
 } from './helper'
 import { EditComponent } from '@/views/edit/types'
@@ -177,12 +179,17 @@ function useSelect (component: UseComponent) {
             return
         }
 
-        const key = e.key
-        const isArrowUp = key === 'ArrowUp'
-        const isArrowDown = key === 'ArrowDown'
-        const isArrowLeft = key === 'ArrowLeft'
-        const isArrowRight = key === 'ArrowRight'
-        const isDel = key === 'Delete'
+        const target = e.target as HTMLElement | null
+        if (target && target.tagName.toLowerCase() === 'input') {
+            return
+        }
+
+        const key = e.key.toLowerCase()
+        const isArrowUp = key === 'arrowup'
+        const isArrowDown = key === 'arrowdown'
+        const isArrowLeft = key === 'arrowleft'
+        const isArrowRight = key === 'arrowright'
+        const isDel = key === 'delete'
 
         let value = 1
 
@@ -237,6 +244,15 @@ function useCanvasPanel () {
     }
     getData()
 
+    function register (e: KeyboardEvent) {
+        if (isSaveKeydown(e)) {
+            e.preventDefault()
+            saveData()
+        }
+    }
+
+    registerKeydownEvent(register)
+
     return {
         saveData
     }
@@ -247,11 +263,11 @@ function useColorPicker () {
     const value = ref<number>()
 
     onMounted(() => {
-        document.addEventListener('click', hide)
+        document.addEventListener('mousedown', hide)
     })
 
     onUnmounted(() => {
-        document.removeEventListener('click', hide)
+        document.removeEventListener('mousedown', hide)
     })
 
     function change ({ rgba }: { rgba: { a: number, b: number, g: number, r: number} }, item: PropValue) {
