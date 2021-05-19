@@ -1,6 +1,6 @@
 import { MyComponentConfig, MyProps, PropValue, BasePropsType, Image } from 'qm-lowCode-component'
 import { useDebounce } from '@/utils'
-import { reactive } from 'vue'
+import { onUnmounted, reactive } from 'vue'
 
 // eslint-disable-next-line
 export const componentList: MyComponentConfig[] = [Image] as any
@@ -24,6 +24,7 @@ function convertProps<T extends MyProps<T>> (props: T) {
 // 生成传入组件的基础props
 export function initComponentStyle (props: BasePropsType) {
     return {
+        zIndex: props.zIndex.value,
         position: 'absolute',
         left: `${props.left.value}px`,
         top: `${props.top.value}px`,
@@ -40,6 +41,14 @@ export function initComponentStyle (props: BasePropsType) {
     }
 }
 
+export function registerKeydownEvent (fn: (e: KeyboardEvent) => void) {
+    window.addEventListener('keydown', fn)
+
+    onUnmounted(() => {
+        window.removeEventListener('keydown', fn)
+    })
+}
+
 // 撤销与回撤功能
 export function createWithdrawal<T> () {
     const queue: Array<T> = []
@@ -51,7 +60,7 @@ export function createWithdrawal<T> () {
     let step = 0
 
     function registerKey (e: KeyboardEvent) {
-        const isZ = e.key === 'z'
+        const isZ = e.key.toLowerCase() === 'z'
 
         if (e.metaKey && isZ) {
             e.preventDefault()
@@ -66,12 +75,7 @@ export function createWithdrawal<T> () {
         }
     }
 
-    // 初始化快捷键
-    window.addEventListener('keydown', registerKey)
-
-    function destroy () {
-        window.removeEventListener('keydown', registerKey)
-    }
+    registerKeydownEvent(registerKey)
 
     let onRevokeCb: (data: T) => void = () => undefined
 
@@ -127,7 +131,6 @@ export function createWithdrawal<T> () {
 
     return {
         push,
-        destroy,
         onRestore,
         onRevoke
     }

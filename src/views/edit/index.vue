@@ -48,8 +48,8 @@
                 draggable="false"
                 :style="initComponentStyle(item.props)"
                 v-bind="item.props"
-                @mousedown="drag.moveStart($event, item)"
-                @click.stop="select.select(item)"
+                @click.stop
+                @mousedown.stop="drag.moveStart($event, item);select.select(item)"
             />
         </div>
 
@@ -67,21 +67,22 @@
                 </div>
 
                 <a-input
-                    v-if="item.type === inputType.string"
+                    v-if="item.type === propPanel.type.string"
                     v-model:value="item.value"
                     class="input"
                     type="text"
                 />
 
                 <a-input
-                    v-if="item.type === inputType.number"
-                    v-model:value="item.value"
+                    v-if="item.type === propPanel.type.number"
+                    :value="item.value"
                     type="number"
                     class="input"
+                    @change="propPanel.changeNumber($event, item)"
                 />
 
                 <div
-                    v-if="item.type === inputType.color"
+                    v-if="item.type === propPanel.type.color"
                     class="input-color"
                     @click.stop
                 >
@@ -103,8 +104,9 @@
                 </div>
 
                 <a-select
-                    v-if="item.type === inputType.select"
+                    v-if="item.type === propPanel.type.select"
                     v-model:value="item.value"
+                    class="input"
                 >
                     <a-select-option
                         v-for="s in item.list"
@@ -133,7 +135,8 @@
     }
 
     .canvas {
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: auto;
         position: absolute;
         top: 80px;
         left: 50%;
@@ -141,6 +144,7 @@
         height: 667px;
         border: 1px solid rgba(0, 0, 0, .1);
         transform: translateX(-50%);
+        box-sizing: content-box;
 
         .select {
             position: absolute;
@@ -178,7 +182,7 @@
         position: absolute;
         top: 0;
         right: 0;
-        width: 300px;
+        width: 250px;
         height: 100%;
         padding: 16px;
         border-left: 1px solid rgba(0, 0, 0, .1);

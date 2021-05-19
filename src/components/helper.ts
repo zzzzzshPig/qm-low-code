@@ -66,6 +66,7 @@ export function selectProp<T> (label = '', value: string | number, list: LabelVa
 
 export function baseProps () {
     return {
+        zIndex: numberProp('层级'),
         width: numberProp('宽度', 100),
         height: numberProp('高度', 100),
         left: numberProp('水平位置'),

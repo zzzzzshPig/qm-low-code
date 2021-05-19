@@ -1,6 +1,6 @@
 import { defineComponent, onUnmounted, ref, watch, computed, reactive, onMounted } from 'vue'
 import { MyProps, MyComponentConfig, ParamType, BasePropsType, PropValue } from 'qm-lowCode-component'
-import { componentList, createWithdrawal, initComponentStyle, initProps } from './helper'
+import { componentList, createWithdrawal, initComponentStyle, initProps, registerKeydownEvent } from './helper'
 import { EditComponent } from '@/views/edit/types'
 import { cloneDeep } from 'lodash'
 import { useRoute } from 'vue-router'
@@ -18,6 +18,8 @@ const components = ref<EditComponent[]>([])
 //         }
 //     }
 // }
+
+type UseComponent = ReturnType<typeof useComponent>
 
 // component
 function useComponent () {
@@ -47,16 +49,26 @@ function useComponent () {
         return component
     }
 
-    function addComponent (item: MyComponentConfig) {
+    function add (item: MyComponentConfig) {
         return insert(render(item))
     }
 
+    function remove (item: EditComponent) {
+        for (let i = 0; i < components.value.length; i++) {
+            if (item.id === components.value[i].id) {
+                components.value.splice(i, 1)
+                break
+            }
+        }
+    }
+
     return {
-        addComponent
+        add,
+        remove
     }
 }
 
-function useDrag (component: ReturnType<typeof useComponent>) {
+function useDrag (component: UseComponent) {
     let dragItem: null | MyComponentConfig = null
 
     function start (item: MyComponentConfig) {
@@ -68,7 +80,7 @@ function useDrag (component: ReturnType<typeof useComponent>) {
             return
         }
 
-        const c = component.addComponent(dragItem)
+        const c = component.add(dragItem)
         c.props.top.value = e.offsetY - c.props.height.value / 2
         c.props.left.value = e.offsetX - c.props.width.value / 2
     }
@@ -80,6 +92,14 @@ function useDrag (component: ReturnType<typeof useComponent>) {
     let editComponent: null | EditComponent = null
     let initTop = 0
     let initLeft = 0
+
+    function moveStart (e: MouseEvent, item: EditComponent) {
+        initTop = e.clientY
+        initLeft = e.clientX
+        editComponent = item
+
+        document.addEventListener('mouseup', moveEnd)
+    }
 
     function move (e: MouseEvent) {
         if (!editComponent) {
@@ -94,14 +114,6 @@ function useDrag (component: ReturnType<typeof useComponent>) {
 
         initTop = nowTop
         initLeft = nowLeft
-    }
-
-    function moveStart (e: MouseEvent, item: EditComponent) {
-        initTop = e.clientY
-        initLeft = e.clientX
-        editComponent = item
-
-        document.addEventListener('mouseup', moveEnd)
     }
 
     function moveEnd () {
@@ -119,7 +131,7 @@ function useDrag (component: ReturnType<typeof useComponent>) {
     }
 }
 
-function useSelect () {
+function useSelect (component: UseComponent) {
     const selectComponentId = ref<number>()
 
     const selectComponent = computed<EditComponent | undefined>(() => {
@@ -144,6 +156,7 @@ function useSelect () {
         const props = selectComponent.value.props as BasePropsType
 
         return {
+            zIndex: props.zIndex.value,
             width: `${props.width.value + padding}px`,
             height: `${props.height.value + padding}px`,
             top: `${props.top.value - halfPadding}px`,
@@ -151,6 +164,41 @@ function useSelect () {
             borderRadius: `${props.borderRadius.value}px`
         }
     })
+
+    function arrowKeys (e: KeyboardEvent) {
+        if (!selectComponent.value) {
+            return
+        }
+
+        const key = e.key
+        const isArrowUp = key === 'ArrowUp'
+        const isArrowDown = key === 'ArrowDown'
+        const isArrowLeft = key === 'ArrowLeft'
+        const isArrowRight = key === 'ArrowRight'
+        const isDel = key === 'Delete'
+
+        let value = 1
+
+        if (e.shiftKey) {
+            value = 10
+        }
+
+        const props = selectComponent.value.props
+
+        if (isArrowUp) {
+            props.top.value -= value
+        } else if (isArrowDown) {
+            props.top.value += value
+        } else if (isArrowLeft) {
+            props.left.value -= value
+        } else if (isArrowRight) {
+            props.left.value += value
+        } else if (isDel) {
+            component.remove(selectComponent.value)
+        }
+    }
+
+    registerKeydownEvent(arrowKeys)
 
     return reactive({
         select,
@@ -225,20 +273,22 @@ function useColorPicker () {
 
 // 属性面板相关
 function usePropPanel () {
-    const inputType = ParamType
+    const type = ParamType
+
+    // format value to number
+    function changeNumber (e: InputEvent, item: PropValue) {
+        item.value = Number((e.target as HTMLInputElement).value)
+    }
 
     return {
-        inputType
+        type,
+        changeNumber
     }
 }
 
 // 回撤
 function useWithdrawal () {
     const withdrawal = createWithdrawal<EditComponent[]>()
-
-    onUnmounted(() => {
-        withdrawal.destroy()
-    })
 
     const skipWatch = ref(false)
 
@@ -284,24 +334,24 @@ export default defineComponent({
     components: getComponents(),
 
     setup () {
-        const select = useSelect()
+        const component = useComponent()
+        const select = useSelect(component)
         const propPanel = usePropPanel()
         const canvasPanel = useCanvasPanel()
         const colorPicker = useColorPicker()
-        const component = useComponent()
         const drag = useDrag(component)
 
         useWithdrawal()
 
         return {
+            propPanel,
             drag,
             select,
             colorPicker,
             components,
             componentList,
             initComponentStyle,
-            save: canvasPanel.saveData,
-            inputType: propPanel.inputType
+            save: canvasPanel.saveData
         }
     }
 })
