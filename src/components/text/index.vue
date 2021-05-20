@@ -6,7 +6,9 @@
 
 <style lang="less" scoped>
     .text-component {
-        word-break: break-all;
+        overflow-x: hidden;
+        white-space: nowrap;
+        text-overflow: initial;
     }
 </style>
 

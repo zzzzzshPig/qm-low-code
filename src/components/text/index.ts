@@ -1,4 +1,4 @@
-import { MyDefineComponent, stringProp, ComponentName, colorProp } from '../helper'
+import { MyDefineComponent, stringProp, ComponentName, colorProp, numberProp } from '../helper'
 import image from './image.svg'
 
 export default MyDefineComponent({
@@ -9,7 +9,7 @@ export default MyDefineComponent({
     image,
 
     props: {
-        height: stringProp('高度', '24px'),
+        height: numberProp('高度', 24),
         text: stringProp('文本', '默认文本'),
         color: colorProp('文本颜色'),
         fontSize: stringProp('字体大小', '16px'),

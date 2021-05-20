@@ -82,13 +82,13 @@ export function selectProp<T> (label = '', value: string | number, list: LabelVa
 export function baseProps () {
     return {
         zIndex: numberProp('层级'),
-        width: stringProp('宽度', '100px'),
-        height: stringProp('高度', '100px'),
-        left: stringProp('水平位置', '0px'),
-        top: stringProp('垂直位置', '0px'),
+        width: numberProp('宽度', 100),
+        height: numberProp('高度', 100),
+        left: numberProp('水平位置', 0),
+        top: numberProp('垂直位置', 0),
         backgroundColor: colorProp('背景颜色'),
-        borderRadius: stringProp('边框圆角', '0px'),
-        borderWidth: stringProp('边框大小', '0px'),
+        borderRadius: numberProp('边框圆角', 0),
+        borderWidth: numberProp('边框大小', 0),
         borderColor: colorProp('边框颜色'),
         borderStyle: selectProp('边框样式', 'none', [
             {
@@ -113,7 +113,8 @@ export function baseProps () {
                 value: 'ridge',
                 label: '浮雕效果'
             }
-        ])
+        ]),
+        translateX: numberProp('旋转')
     }
 }
 

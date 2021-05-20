@@ -68,6 +68,8 @@ function convertProps<T extends MyProps<T>> (props: T) {
     return Object.fromEntries(res.entries()) as BasePropsType
 }
 
+const shouldPxProp = ['width', 'height', 'top', 'left', 'borderWidth', 'borderRadius', 'translateX']
+
 // 生成传入组件的基础props
 export function initComponentStyle (props: BasePropsType) {
     const keys = Reflect.ownKeys(props) as (keyof BasePropsType)[]
@@ -75,20 +77,17 @@ export function initComponentStyle (props: BasePropsType) {
 
     keys.forEach(a => {
         res[a] = props[a].value
+
+        if (shouldPxProp.includes(a)) {
+            res[a] = numberToString(res[a] as number)
+        }
     })
 
     return {
         position: 'absolute',
-        ...res
+        ...res,
+        transform: `rotate(${props.translateX.value}deg)`
     }
-}
-
-export function registerKeydownEvent (fn: (e: KeyboardEvent) => void, dom: HTMLElement | Window = window) {
-    dom.addEventListener('keydown', fn as never)
-
-    onUnmounted(() => {
-        dom.removeEventListener('keydown', fn as never)
-    })
 }
 
 // 撤销与回撤功能
@@ -101,7 +100,7 @@ export function createWithdrawal<T> () {
     // 指针
     let step = 0
 
-    function registerKey (e: KeyboardEvent) {
+    function registerKeydown (e: KeyboardEvent) {
         const isZ = e.key.toLowerCase() === 'z'
 
         if (e.metaKey && isZ) {
@@ -116,8 +115,6 @@ export function createWithdrawal<T> () {
             }
         }
     }
-
-    registerKeydownEvent(registerKey)
 
     let onRevokeCb: (data: T) => void = () => undefined
 
@@ -174,6 +171,7 @@ export function createWithdrawal<T> () {
     return {
         push,
         onRestore,
-        onRevoke
+        onRevoke,
+        registerKeydown
     }
 }

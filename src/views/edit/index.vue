@@ -89,23 +89,29 @@
                 <div
                     v-if="item.type === propPanel.type.color"
                     class="input-color"
-                    @mousedown.stop
                 >
-                    <div
-                        class="box"
-                        :style="{
-                            backgroundColor: item.value
-                        }"
-                        @click="colorPicker.show(key)"
-                    />
+                    <a-popover
+                        placement="left"
+                        overlay-class-name="popover-color-picker"
+                        trigger="click"
+                        destroy-tooltip-on-hide
+                    >
+                        <template #content>
+                            <color-picker
+                                class="picker"
+                                style="width: 220px"
+                                :color="item.value"
+                                @changeColor="colorPicker.change($event, item)"
+                            />
+                        </template>
 
-                    <color-picker
-                        v-if="colorPicker.canShowItem(key)"
-                        class="picker"
-                        style="width: 220px"
-                        :color="item.value"
-                        @changeColor="colorPicker.change($event, item)"
-                    />
+                        <div
+                            class="btn-show"
+                            :style="{
+                                backgroundColor: item.value
+                            }"
+                        />
+                    </a-popover>
                 </div>
 
                 <a-select
@@ -157,10 +163,8 @@
 
         .select {
             position: absolute;
-            padding: 4px;
-            border: 2px solid #00b7ff;
+            border: 2px solid #1090ff;
             box-sizing: content-box;
-            transform: translate(-6px, -6px);
         }
     }
 
@@ -221,10 +225,11 @@
                 .relative;
                 margin-top: 4px;
 
-                .box {
+                .btn-show {
                     width: 60px;
                     height: 24px;
                     border: 1px solid rgba(0, 0, 0, .2);
+                    cursor: pointer;
                 }
 
                 .picker {
@@ -234,6 +239,20 @@
                     right: -74px;
                 }
             }
+        }
+    }
+</style>
+
+<style lang="less">
+    .popover-color-picker {
+        padding-top: 0;
+
+        .ant-popover-arrow {
+            display: none;
+        }
+
+        .ant-popover-inner-content {
+            padding: 0;
         }
     }
 </style>

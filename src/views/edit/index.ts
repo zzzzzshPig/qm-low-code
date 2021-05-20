@@ -1,16 +1,11 @@
-import { defineComponent, onUnmounted, ref, watch, computed, reactive, onMounted } from 'vue'
+import { defineComponent, ref, watch, computed, reactive } from 'vue'
 import { MyProps, MyComponentConfig, ParamType, BasePropsType, PropValue } from 'qm-lowCode-component'
 import {
-    addNumberOrString,
     componentList,
     createWithdrawal,
-    divisionNumberOrString,
     initComponentStyle,
     initProps,
-    isSaveKeydown,
-    numberToString,
-    reduceNumberOrString,
-    registerKeydownEvent
+    isSaveKeydown, numberToString
 } from './helper'
 import { EditComponent } from '@/views/edit/types'
 import { cloneDeep } from 'lodash'
@@ -92,8 +87,8 @@ function useDrag (component: UseComponent) {
         }
 
         const c = component.add(dragItem)
-        c.props.top.value = numberToString(reduceNumberOrString(e.offsetY, divisionNumberOrString(c.props.height.value, 2)))
-        c.props.left.value = numberToString(reduceNumberOrString(e.offsetX, divisionNumberOrString(c.props.width.value, 2)))
+        c.props.top.value = e.offsetY - c.props.height.value / 2
+        c.props.left.value = e.offsetX - c.props.width.value / 2
     }
 
     function restore () {
@@ -120,8 +115,8 @@ function useDrag (component: UseComponent) {
         const nowTop = e.clientY
         const nowLeft = e.clientX
 
-        editComponent.props.top.value = numberToString(addNumberOrString(editComponent.props.top.value, nowTop - initTop))
-        editComponent.props.left.value = numberToString(addNumberOrString(editComponent.props.left.value, nowLeft - initLeft))
+        editComponent.props.top.value += nowTop - initTop
+        editComponent.props.left.value += nowLeft - initLeft
 
         initTop = nowTop
         initLeft = nowLeft
@@ -166,15 +161,16 @@ function useSelect (component: UseComponent) {
 
         return {
             zIndex: props.zIndex.value,
-            width: props.width.value,
-            height: props.height.value,
-            top: props.top.value,
-            left: props.left.value,
-            borderRadius: props.borderRadius.value
+            width: numberToString(props.width.value),
+            height: numberToString(props.height.value),
+            top: numberToString(props.top.value),
+            left: numberToString(props.left.value),
+            borderRadius: numberToString(props.borderRadius.value),
+            transform: `translate(-2px, -2px) rotate(${props.translateX.value}deg)`
         }
     })
 
-    function arrowKeys (e: KeyboardEvent) {
+    function registerKeydown (e: KeyboardEvent) {
         if (!selectComponent.value) {
             return
         }
@@ -200,25 +196,24 @@ function useSelect (component: UseComponent) {
         const props = selectComponent.value.props
 
         if (isArrowUp) {
-            props.top.value = numberToString(reduceNumberOrString(props.top.value, value))
+            props.top.value -= value
         } else if (isArrowDown) {
-            props.top.value = numberToString(addNumberOrString(props.top.value, value))
+            props.top.value += value
         } else if (isArrowLeft) {
-            props.left.value = numberToString(reduceNumberOrString(props.left.value, value))
+            props.left.value -= value
         } else if (isArrowRight) {
-            props.left.value = numberToString(addNumberOrString(props.left.value, value))
+            props.left.value += value
         } else if (isDel) {
             component.remove(selectComponent.value)
         }
     }
 
-    registerKeydownEvent(arrowKeys)
-
     return reactive({
         select,
         noSelect,
         cmtSelectStyle,
-        selectComponent
+        selectComponent,
+        registerKeydown
     })
 }
 
@@ -244,17 +239,16 @@ function useCanvasPanel () {
     }
     getData()
 
-    function register (e: KeyboardEvent) {
+    function registerKeydown (e: KeyboardEvent) {
         if (isSaveKeydown(e)) {
             e.preventDefault()
             saveData()
         }
     }
 
-    registerKeydownEvent(register)
-
     return {
-        saveData
+        saveData,
+        registerKeydown
     }
 }
 
@@ -262,35 +256,13 @@ function useCanvasPanel () {
 function useColorPicker () {
     const value = ref<number>()
 
-    onMounted(() => {
-        document.addEventListener('mousedown', hide)
-    })
-
-    onUnmounted(() => {
-        document.removeEventListener('mousedown', hide)
-    })
-
     function change ({ rgba }: { rgba: { a: number, b: number, g: number, r: number} }, item: PropValue) {
         item.value = `rgba(${rgba.r},${rgba.g},${rgba.b},${rgba.a})`
     }
 
-    function show (index: number) {
-        value.value = index
-    }
-
-    function hide () {
-        value.value = undefined
-    }
-
-    function canShowItem (index: number) {
-        return value.value && index === value.value
-    }
-
     return reactive({
         change,
-        value,
-        show,
-        canShowItem
+        value
     })
 }
 
