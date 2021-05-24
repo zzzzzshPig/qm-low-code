@@ -1,15 +1,11 @@
-import { MyDefineComponent, ComponentName, colorProp } from '../helper'
-import image from './image.svg'
+import { stringProp } from '../helper'
+import { defineComponent } from 'vue'
 
-export default MyDefineComponent({
-    name: ComponentName.Block,
-
-    label: '块',
-
-    image,
+export default defineComponent({
+    name: 'ZBlock',
 
     props: {
-        backgroundColor: colorProp('背景颜色', '#000')
+        backgroundColor: stringProp('#000')
     },
 
     setup () {

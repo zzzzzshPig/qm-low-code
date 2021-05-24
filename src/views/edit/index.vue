@@ -39,96 +39,26 @@
             @mousemove="drag.move"
         >
             <div
-                v-if="select.selectComponent"
-                class="select"
-                :style="select.cmtSelectStyle"
-            />
-
-            <component
-                :is="item.name"
                 v-for="item in components"
                 :key="item.id"
-                class="component"
-                draggable="false"
-                :style="initComponentStyle(item.props)"
-                v-bind="item.props"
+                class="cover"
                 @click.stop
-                @mousedown.stop="drag.moveStart($event, item);select.select(item)"
-            />
+            >
+                <component
+                    :is="item.name"
+                    class="component"
+                    draggable="false"
+                    v-bind="item.props"
+                    @mousedown.stop="drag.moveStart($event, item);select.select(item)"
+                />
+            </div>
         </div>
 
         <div
             v-if="select.selectComponent"
             class="prop-list"
             @click.stop
-        >
-            <div
-                v-for="(item, key) in select.selectComponent.props"
-                :key="key"
-                class="item"
-            >
-                <div class="label">
-                    {{ item.label }}：
-                </div>
-
-                <a-input
-                    v-if="item.type === propPanel.type.string"
-                    v-model:value="item.value"
-                    class="input"
-                    type="text"
-                />
-
-                <a-input
-                    v-if="item.type === propPanel.type.number"
-                    :value="item.value"
-                    type="number"
-                    class="input"
-                    @change="propPanel.changeNumber($event, item)"
-                />
-
-                <div
-                    v-if="item.type === propPanel.type.color"
-                    class="input-color"
-                >
-                    <a-popover
-                        placement="left"
-                        overlay-class-name="popover-color-picker"
-                        trigger="click"
-                        destroy-tooltip-on-hide
-                    >
-                        <template #content>
-                            <color-picker
-                                class="picker"
-                                style="width: 220px"
-                                :color="item.value"
-                                @changeColor="colorPicker.change($event, item)"
-                            />
-                        </template>
-
-                        <div
-                            class="btn-show"
-                            :style="{
-                                backgroundColor: item.value
-                            }"
-                        />
-                    </a-popover>
-                </div>
-
-                <a-select
-                    v-if="item.type === propPanel.type.select"
-                    v-model:value="item.value"
-                    class="input"
-                >
-                    <a-select-option
-                        v-for="s in item.list"
-                        :key="s.value"
-                        :value="s.value"
-                    >
-                        {{ s.label }}
-                    </a-select-option>
-                </a-select>
-            </div>
-        </div>
+        />
     </div>
 </template>
 
@@ -161,11 +91,11 @@
             cursor: pointer;
         }
 
-        .select {
-            position: absolute;
-            border: 2px solid #1090ff;
-            box-sizing: content-box;
-        }
+        //.select {
+        //    position: absolute;
+        //    border: 2px solid #1090ff;
+        //    box-sizing: content-box;
+        //}
     }
 
     .component-list {

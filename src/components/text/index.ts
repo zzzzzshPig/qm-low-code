@@ -1,20 +1,17 @@
-import { MyDefineComponent, stringProp, ComponentName, colorProp, numberProp } from '../helper'
-import image from './image.svg'
+import { stringProp, numberProp, baseProps } from '../helper'
+import { defineComponent } from 'vue'
 
-export default MyDefineComponent({
-    name: ComponentName.Text,
-
-    label: '文本',
-
-    image,
+export default defineComponent({
+    name: 'ZText',
 
     props: {
-        height: numberProp('高度', 24),
-        text: stringProp('文本', '默认文本'),
-        color: colorProp('文本颜色'),
-        fontSize: stringProp('字体大小', '16px'),
-        fontWeight: stringProp('字体粗细', '400'),
-        lineHeight: stringProp('行间距', '24px')
+        ...baseProps(),
+        height: numberProp(24),
+        text: stringProp('默认文本'),
+        color: stringProp(),
+        fontSize: numberProp(16),
+        fontWeight: numberProp(400),
+        lineHeight: numberProp(24)
     },
 
     setup () {

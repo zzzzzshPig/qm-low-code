@@ -1,13 +1,11 @@
 import { defineComponent, ref, watch, computed, reactive } from 'vue'
-import { MyProps, MyComponentConfig, ParamType, BasePropsType, PropValue } from 'qm-lowCode-component'
 import {
-    componentList,
+    importComponents,
     createWithdrawal,
-    initComponentStyle,
     initProps,
-    isSaveKeydown, numberToString
+    isSaveKeydown, componentList
 } from './helper'
-import { EditComponent } from '@/views/edit/types'
+import { EditComponent, ImportComponent } from '@/views/edit/types'
 import { cloneDeep } from 'lodash'
 import { useRoute } from 'vue-router'
 import { apiEdit } from '@/apis/edit'
@@ -37,7 +35,7 @@ function useComponent () {
         return lastComponent.id + 1
     })
 
-    function render<T extends MyProps<T>> (item: MyComponentConfig) {
+    function render (item: ImportComponent) {
         const props = initProps(item)
 
         const component: EditComponent = {
@@ -55,7 +53,7 @@ function useComponent () {
         return component
     }
 
-    function add (item: MyComponentConfig) {
+    function add (item: ImportComponent) {
         return insert(render(item))
     }
 
@@ -75,9 +73,9 @@ function useComponent () {
 }
 
 function useDrag (component: UseComponent) {
-    let dragItem: null | MyComponentConfig = null
+    let dragItem: null | ImportComponent = null
 
-    function start (item: MyComponentConfig) {
+    function start (item: ImportComponent) {
         dragItem = item
     }
 
@@ -87,8 +85,8 @@ function useDrag (component: UseComponent) {
         }
 
         const c = component.add(dragItem)
-        c.props.top.value = e.offsetY - c.props.height.value / 2
-        c.props.left.value = e.offsetX - c.props.width.value / 2
+        c.props.top = e.offsetY - c.props.height / 2
+        c.props.left = e.offsetX - c.props.width / 2
     }
 
     function restore () {
@@ -115,8 +113,8 @@ function useDrag (component: UseComponent) {
         const nowTop = e.clientY
         const nowLeft = e.clientX
 
-        editComponent.props.top.value += nowTop - initTop
-        editComponent.props.left.value += nowLeft - initLeft
+        editComponent.props.top += nowTop - initTop
+        editComponent.props.left += nowLeft - initLeft
 
         initTop = nowTop
         initLeft = nowLeft
@@ -152,24 +150,6 @@ function useSelect (component: UseComponent) {
         selectComponentId.value = undefined
     }
 
-    const cmtSelectStyle = computed(() => {
-        if (!selectComponent.value) {
-            return
-        }
-
-        const props = selectComponent.value.props as BasePropsType
-
-        return {
-            zIndex: props.zIndex.value,
-            width: numberToString(props.width.value),
-            height: numberToString(props.height.value),
-            top: numberToString(props.top.value),
-            left: numberToString(props.left.value),
-            borderRadius: numberToString(props.borderRadius.value),
-            transform: `translate(-2px, -2px) rotate(${props.translateX.value}deg)`
-        }
-    })
-
     function registerKeydown (e: KeyboardEvent) {
         if (!selectComponent.value) {
             return
@@ -196,13 +176,13 @@ function useSelect (component: UseComponent) {
         const props = selectComponent.value.props
 
         if (isArrowUp) {
-            props.top.value -= value
+            props.top -= value
         } else if (isArrowDown) {
-            props.top.value += value
+            props.top += value
         } else if (isArrowLeft) {
-            props.left.value -= value
+            props.left -= value
         } else if (isArrowRight) {
-            props.left.value += value
+            props.left += value
         } else if (isDel) {
             component.remove(selectComponent.value)
         }
@@ -211,7 +191,6 @@ function useSelect (component: UseComponent) {
     return reactive({
         select,
         noSelect,
-        cmtSelectStyle,
         selectComponent,
         registerKeydown
     })
@@ -254,31 +233,12 @@ function useCanvasPanel () {
 
 // colorPicker
 function useColorPicker () {
-    const value = ref<number>()
-
-    function change ({ rgba }: { rgba: { a: number, b: number, g: number, r: number} }, item: PropValue) {
-        item.value = `rgba(${rgba.r},${rgba.g},${rgba.b},${rgba.a})`
-    }
-
-    return reactive({
-        change,
-        value
-    })
+//
 }
 
 // 属性面板相关
 function usePropPanel () {
-    const type = ParamType
-
-    // format value to number
-    function changeNumber (e: InputEvent, item: PropValue) {
-        item.value = Number((e.target as HTMLInputElement).value)
-    }
-
-    return {
-        type,
-        changeNumber
-    }
+//
 }
 
 // 回撤
@@ -312,21 +272,11 @@ function useWithdrawal () {
     watchComponents()
 }
 
-function getComponents () {
-    const res: Record<string, MyComponentConfig> = {} as never
-
-    componentList.forEach(a => {
-        res[a.name] = a
-    })
-
-    return {
-        ...res,
-        ColorPicker
-    }
-}
-
 export default defineComponent({
-    components: getComponents(),
+    components: {
+        ...importComponents,
+        ColorPicker
+    },
 
     setup () {
         const component = useComponent()
@@ -345,7 +295,6 @@ export default defineComponent({
             colorPicker,
             components,
             componentList,
-            initComponentStyle,
             save: canvasPanel.saveData
         }
     }

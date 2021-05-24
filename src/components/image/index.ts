@@ -1,15 +1,12 @@
-import { MyDefineComponent, stringProp, ComponentName } from '../helper'
-import image from './image.svg'
+import { baseProps, stringProp } from '../helper'
+import { defineComponent } from 'vue'
 
-export default MyDefineComponent({
-    name: ComponentName.Image,
-
-    label: '图片',
-
-    image,
+export default defineComponent({
+    name: 'ZImage',
 
     props: {
-        src: stringProp('图片地址', image)
+        ...baseProps(),
+        src: stringProp('')
     },
 
     setup () {

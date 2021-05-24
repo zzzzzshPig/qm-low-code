@@ -1,9 +1,35 @@
-import { MyComponentConfig, MyProps, PropValue, BasePropsType, Image, Text, Block } from 'qm-lowCode-component'
+import { Image, Text, Block } from 'qm-lowCode-component'
 import { useDebounce } from '@/utils'
-import { onUnmounted, reactive } from 'vue'
+import { reactive } from 'vue'
+import { basePropTypeKeys, ComponentListItem, EditComponent, ImportComponent, PropValueType } from './types'
+import imageSvg from './images/image.svg'
+import textSvg from './images/text.svg'
+import blockSvg from './images/block.svg'
 
-// eslint-disable-next-line
-export const componentList: MyComponentConfig[] = [Image, Text, Block] as any
+export const importComponents: Record<'Image' | 'Text' | 'Block', ImportComponent> = {
+    Image,
+    Text,
+    Block
+} as never
+
+export const componentList: ComponentListItem[] = [
+    {
+        name: Image.default.name,
+        label: '图片',
+        image: imageSvg,
+        props: Image.default.props
+    }, {
+        name: Text.default.name,
+        label: '文本',
+        image: textSvg,
+        props: Text.default.props
+    }, {
+        name: Block.default.name,
+        label: '块',
+        image: blockSvg,
+        props: Block.default.props
+    }
+]
 
 const isMacOs = navigator.platform.toLowerCase().includes('mac')
 
@@ -14,80 +40,20 @@ export function isSaveKeydown (e: KeyboardEvent) {
     return handler && key === 's'
 }
 
-export function divisionNumberOrString (...args: Array<number | string>) {
-    let res = parseInt(args[0].toString())
-
-    args.shift()
-
-    args.forEach(a => {
-        res /= parseInt(a.toString())
-    })
-
-    return res
+export function initProps (component: ImportComponent) {
+    return reactive(convertProps(component.props))
 }
 
-export function reduceNumberOrString (...args: Array<number | string>) {
-    let res = parseInt(args[0].toString())
-
-    args.shift()
-
-    args.forEach(a => {
-        res -= parseInt(a.toString())
-    })
-
-    return res
-}
-
-export function addNumberOrString (...args: Array<number | string>) {
-    let res = 0
-
-    args.forEach(a => {
-        res += parseInt(a.toString())
-    })
-
-    return res
-}
-
-export function numberToString (num: number, unit = 'px') {
-    return num + unit
-}
-
-export function initProps (component: MyComponentConfig) {
-    return reactive(convertProps(component.props)) as BasePropsType
-}
-
-function convertProps<T extends MyProps<T>> (props: T) {
-    const res = new Map<keyof T, PropValue>()
-    const keys = Reflect.ownKeys(props) as (keyof T)[]
+function convertProps (props: ImportComponent['props']) {
+    const res = new Map<basePropTypeKeys, PropValueType>()
+    const keys = Reflect.ownKeys(props) as basePropTypeKeys[]
 
     keys.forEach(a => {
         const prop = props[a]
-        res.set(a, prop.default())
+        res.set(a, prop.default)
     })
 
-    return Object.fromEntries(res.entries()) as BasePropsType
-}
-
-const shouldPxProp = ['width', 'height', 'top', 'left', 'borderWidth', 'borderRadius', 'translateX']
-
-// 生成传入组件的基础props
-export function initComponentStyle (props: BasePropsType) {
-    const keys = Reflect.ownKeys(props) as (keyof BasePropsType)[]
-    const res: Record<keyof BasePropsType, unknown> = {} as never
-
-    keys.forEach(a => {
-        res[a] = props[a].value
-
-        if (shouldPxProp.includes(a)) {
-            res[a] = numberToString(res[a] as number)
-        }
-    })
-
-    return {
-        position: 'absolute',
-        ...res,
-        transform: `rotate(${props.translateX.value}deg)`
-    }
+    return Object.fromEntries(res.entries()) as EditComponent['props']
 }
 
 // 撤销与回撤功能
