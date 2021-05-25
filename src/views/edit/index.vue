@@ -46,10 +46,9 @@
             >
                 <component
                     :is="item.name"
-                    class="component"
                     draggable="false"
                     v-bind="item.props"
-                    @mousedown.stop="drag.moveStart($event, item);select.select(item)"
+                    @mousedown.stop="drag.moveStart($event, item)"
                 />
             </div>
         </div>

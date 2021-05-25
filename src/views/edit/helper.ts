@@ -1,33 +1,33 @@
 import { Image, Text, Block } from 'qm-lowCode-component'
 import { useDebounce } from '@/utils'
 import { reactive } from 'vue'
-import { basePropTypeKeys, ComponentListItem, EditComponent, ImportComponent, PropValueType } from './types'
+import { BasePropTypeKeys, ComponentListItem, EditComponent, ImportComponent, PropValueType } from './types'
 import imageSvg from './images/image.svg'
 import textSvg from './images/text.svg'
 import blockSvg from './images/block.svg'
 
-export const importComponents: Record<'Image' | 'Text' | 'Block', ImportComponent> = {
-    Image,
-    Text,
-    Block
-} as never
+export const importComponents = {
+    [Image.name]: Image,
+    [Text.name]: Text,
+    [Block.name]: Block
+}
 
 export const componentList: ComponentListItem[] = [
     {
-        name: Image.default.name,
+        name: Image.name,
         label: '图片',
         image: imageSvg,
-        props: Image.default.props
+        props: Image.props
     }, {
-        name: Text.default.name,
+        name: Text.name,
         label: '文本',
         image: textSvg,
-        props: Text.default.props
+        props: Text.props
     }, {
-        name: Block.default.name,
+        name: Block.name,
         label: '块',
         image: blockSvg,
-        props: Block.default.props
+        props: Block.props
     }
 ]
 
@@ -45,8 +45,8 @@ export function initProps (component: ImportComponent) {
 }
 
 function convertProps (props: ImportComponent['props']) {
-    const res = new Map<basePropTypeKeys, PropValueType>()
-    const keys = Reflect.ownKeys(props) as basePropTypeKeys[]
+    const res = new Map<BasePropTypeKeys, PropValueType>()
+    const keys = Reflect.ownKeys(props) as BasePropTypeKeys[]
 
     keys.forEach(a => {
         const prop = props[a]

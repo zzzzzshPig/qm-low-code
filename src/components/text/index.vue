@@ -1,6 +1,9 @@
 <template>
-    <div class="text-component">
-        {{ text.value }}
+    <div
+        class="text-component"
+        :style="baseStyle"
+    >
+        {{ text }}
     </div>
 </template>
 

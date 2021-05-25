@@ -1,5 +1,6 @@
 <template>
     <img
+        :style="baseStyle"
         :src="src.value"
         alt=""
     >

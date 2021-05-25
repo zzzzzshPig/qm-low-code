@@ -1,5 +1,5 @@
-import { stringProp, numberProp, baseProps } from '../helper'
-import { defineComponent } from 'vue'
+import { stringProp, numberProp, baseProps, cmtBaseStyle } from '../helper'
+import { computed, defineComponent } from 'vue'
 
 export default defineComponent({
     name: 'ZText',
@@ -14,8 +14,17 @@ export default defineComponent({
         lineHeight: numberProp(24)
     },
 
-    setup () {
+    setup (props) {
         return {
+            baseStyle: computed(() => {
+                return {
+                    ...cmtBaseStyle(props).value,
+                    fontSize: `${props.fontSize}px`,
+                    color: props.color,
+                    fontWeight: props.fontWeight,
+                    lineHeight: `${props.lineHeight}px`
+                }
+            })
         }
     }
 })

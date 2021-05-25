@@ -1,5 +1,5 @@
 <template>
-    <div />
+    <div :style="baseStyle" />
 </template>
 
 <style lang="less" scoped>
