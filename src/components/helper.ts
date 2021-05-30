@@ -23,6 +23,7 @@ export function booleanProp (value = false) {
 
 export function baseProps () {
     return {
+        opacity: numberProp(100),
         zIndex: numberProp(),
         width: numberProp(100),
         height: numberProp(100),
@@ -32,7 +33,7 @@ export function baseProps () {
         borderRadius: numberProp(),
         borderWidth: numberProp(),
         borderColor: stringProp(),
-        borderStyle: numberProp(),
+        borderStyle: stringProp('none'),
         rotate: numberProp()
     }
 }
@@ -49,6 +50,7 @@ export function cmtBaseStyle (props: {
     return computed(() => {
         return {
             position: 'absolute',
+            opacity: props.opacity / 100,
             zIndex: props.zIndex,
             width: `${props.width}px`,
             height: `${props.height}px`,

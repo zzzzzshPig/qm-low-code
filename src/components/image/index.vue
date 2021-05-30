@@ -1,7 +1,7 @@
 <template>
     <img
         :style="baseStyle"
-        :src="src.value"
+        :src="src"
         alt=""
     >
 </template>

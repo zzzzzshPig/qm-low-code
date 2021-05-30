@@ -3,15 +3,15 @@ import {
     importComponents,
     createWithdrawal,
     initProps,
-    isSaveKeydown, componentList
+    isSaveKeydown, componentList, componentNames
 } from './helper'
 import { EditComponent, ImportComponent } from '@/views/edit/types'
 import { cloneDeep } from 'lodash'
 import { useRoute } from 'vue-router'
 import { apiEdit } from '@/apis/edit'
 import { message } from 'ant-design-vue'
-import { ColorPicker } from 'vue-color-kit'
-import 'vue-color-kit/dist/vue-color-kit.css'
+import ColorPicker from './components/colorPicker/index.vue'
+import MyInput from './components/input/index.vue'
 
 const components = ref<EditComponent[]>([])
 
@@ -22,6 +22,31 @@ const components = ref<EditComponent[]>([])
 //         }
 //     }
 // }
+
+const borderStyleOptions = [
+    {
+        value: 'none',
+        label: '无边框'
+    }, {
+        value: 'solid',
+        label: '实线'
+    }, {
+        value: 'dotted',
+        label: '圆点'
+    }, {
+        value: 'dashed',
+        label: '虚线'
+    }, {
+        value: 'double',
+        label: '双实线'
+    }, {
+        value: 'groove',
+        label: '雕刻效果'
+    }, {
+        value: 'ridge',
+        label: '浮雕效果'
+    }
+]
 
 type UseComponent = ReturnType<typeof useComponent>
 
@@ -135,13 +160,13 @@ function useDrag (component: UseComponent) {
     }
 }
 
+const selectComponentId = ref<number>()
+
+const selectComponent = computed<EditComponent | undefined>(() => {
+    return components.value.filter(a => a.id === selectComponentId.value)[0]
+})
+
 function useSelect (component: UseComponent) {
-    const selectComponentId = ref<number>()
-
-    const selectComponent = computed<EditComponent | undefined>(() => {
-        return components.value.filter(a => a.id === selectComponentId.value)[0]
-    })
-
     function select (component: EditComponent) {
         selectComponentId.value = component.id
     }
@@ -188,9 +213,16 @@ function useSelect (component: UseComponent) {
         }
     }
 
+    const selectProps = computed(() => {
+        if (!selectComponent.value) return
+
+        return selectComponent.value.props
+    })
+
     return reactive({
         select,
         noSelect,
+        selectProps,
         selectComponent,
         registerKeydown
     })
@@ -231,14 +263,24 @@ function useCanvasPanel () {
     }
 }
 
-// colorPicker
-function useColorPicker () {
-//
-}
-
 // 属性面板相关
 function usePropPanel () {
-//
+    const name = computed(() => {
+        return String(selectComponent.value?.name)
+    })
+
+    const showFont = computed(() => {
+        return [componentNames.text].includes(name.value)
+    })
+
+    const showImage = computed(() => {
+        return [componentNames.image].includes(name.value)
+    })
+
+    return reactive({
+        showFont,
+        showImage
+    })
 }
 
 // 回撤
@@ -275,27 +317,28 @@ function useWithdrawal () {
 export default defineComponent({
     components: {
         ...importComponents,
-        ColorPicker
+        ColorPicker,
+        MyInput
     },
 
     setup () {
         const component = useComponent()
-        const propPanel = usePropPanel()
         const canvasPanel = useCanvasPanel()
-        const colorPicker = useColorPicker()
         const drag = useDrag(component)
         const select = useSelect(component)
+        const propPanel = usePropPanel()
 
         useWithdrawal()
 
         return {
             drag,
             select,
+            MyInput,
             propPanel,
-            colorPicker,
             components,
             componentList,
-            save: canvasPanel.saveData
+            save: canvasPanel.saveData,
+            borderStyleOptions
         }
     }
 })

@@ -6,25 +6,31 @@ import imageSvg from './images/image.svg'
 import textSvg from './images/text.svg'
 import blockSvg from './images/block.svg'
 
+export const componentNames = {
+    image: Image.name,
+    text: Text.name,
+    block: Block.name
+}
+
 export const importComponents = {
-    [Image.name]: Image,
-    [Text.name]: Text,
-    [Block.name]: Block
+    [componentNames.image]: Image,
+    [componentNames.text]: Text,
+    [componentNames.block]: Block
 }
 
 export const componentList: ComponentListItem[] = [
     {
-        name: Image.name,
+        name: componentNames.image,
         label: '图片',
         image: imageSvg,
         props: Image.props
     }, {
-        name: Text.name,
+        name: componentNames.text,
         label: '文本',
         image: textSvg,
         props: Text.props
     }, {
-        name: Block.name,
+        name: componentNames.block,
         label: '块',
         image: blockSvg,
         props: Block.props
