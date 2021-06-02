@@ -31,23 +31,32 @@
         </div>
 
         <div
-            tabindex="-1"
-            class="canvas"
-            @drop="drag.end"
-            @dragover.prevent
-            @mousemove="drag.move"
+            class="canvas-box"
+            @click="select.noSelect"
         >
             <div
-                v-for="item in components"
-                :key="item.id"
-                class="cover"
-                @click.stop="select.select(item)"
+                tabindex="-1"
+                class="canvas"
+                @click.stop="select.noSelect"
+                @drop="drag.end"
+                @dragover.prevent
+                @mousemove="drag.move"
             >
                 <component
                     :is="item.name"
-                    draggable="false"
+                    v-for="item in components"
+                    :key="item.id"
                     v-bind="item.props"
-                    @mousedown.stop="drag.moveStart($event, item)"
+                    @click.stop
+                    @mousedown.stop="select.select($event, item)"
+                />
+
+                <div
+                    v-if="select.selectComponent"
+                    :style="select.selectStyle"
+                    class="cover"
+                    @click.stop
+                    @mousedown="select.select($event, select.selectComponent)"
                 />
             </div>
         </div>
@@ -307,27 +316,30 @@
         height: 100%;
     }
 
-    .canvas {
-        overflow-x: hidden;
-        overflow-y: auto;
-        position: absolute;
-        top: 80px;
-        left: 50%;
-        width: 375px;
-        height: 667px;
-        border: 1px solid rgba(0, 0, 0, .1);
-        transform: translateX(-50%);
-        box-sizing: content-box;
+    .canvas-box {
+        width: 100%;
+        height: 100%;
 
-        .component {
-            cursor: pointer;
+        .canvas {
+            overflow-x: hidden;
+            overflow-y: auto;
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            width: 375px;
+            height: 667px;
+            border: 1px solid rgba(0, 0, 0, .1);
+            transform: translateX(-50%);
+            box-sizing: content-box;
+
+            .cover {
+                margin-top: -2px;
+                margin-left: -2px;
+                border: 2px solid #1090ff;
+                box-sizing: content-box;
+                cursor: pointer;
+            }
         }
-
-        //.select {
-        //    position: absolute;
-        //    border: 2px solid #1090ff;
-        //    box-sizing: content-box;
-        //}
     }
 
     .component-list {

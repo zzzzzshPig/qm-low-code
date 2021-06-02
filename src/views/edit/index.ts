@@ -50,6 +50,8 @@ const borderStyleOptions = [
 
 type UseComponent = ReturnType<typeof useComponent>
 
+type UseDrag = ReturnType<typeof useDrag>
+
 // component
 function useComponent () {
     const uid = computed(() => {
@@ -112,6 +114,8 @@ function useDrag (component: UseComponent) {
         const c = component.add(dragItem)
         c.props.top = e.offsetY - c.props.height / 2
         c.props.left = e.offsetX - c.props.width / 2
+
+        selectComponentId.value = c.id
     }
 
     function restore () {
@@ -166,9 +170,10 @@ const selectComponent = computed<EditComponent | undefined>(() => {
     return components.value.filter(a => a.id === selectComponentId.value)[0]
 })
 
-function useSelect (component: UseComponent) {
-    function select (component: EditComponent) {
+function useSelect (component: UseComponent, drag: UseDrag) {
+    function select (e: MouseEvent, component: EditComponent) {
         selectComponentId.value = component.id
+        drag.moveStart(e, component)
     }
 
     function noSelect () {
@@ -219,7 +224,24 @@ function useSelect (component: UseComponent) {
         return selectComponent.value.props
     })
 
+    const selectStyle = computed(() => {
+        if (!selectComponent.value) return
+
+        const props = selectComponent.value.props
+
+        return {
+            zIndex: props.zIndex,
+            position: 'absolute',
+            width: `${props.width}px`,
+            height: `${props.height}px`,
+            top: `${props.top}px`,
+            left: `${props.left}px`,
+            transform: `rotate(${props.rotate}deg)`
+        }
+    })
+
     return reactive({
+        selectStyle,
         select,
         noSelect,
         selectProps,
@@ -325,7 +347,7 @@ export default defineComponent({
         const component = useComponent()
         const canvasPanel = useCanvasPanel()
         const drag = useDrag(component)
-        const select = useSelect(component)
+        const select = useSelect(component, drag)
         const propPanel = usePropPanel()
 
         useWithdrawal()
