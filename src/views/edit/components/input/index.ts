@@ -1,4 +1,4 @@
-import { defineComponent, ref, watch } from 'vue'
+import { defineComponent, ref, watchEffect } from 'vue'
 
 export default defineComponent({
     props: {
@@ -11,16 +11,21 @@ export default defineComponent({
     setup (props, ctx) {
         const modelValue = ref(props.value)
 
-        watch(modelValue, (n, o) => {
-            const res = Number(n)
-
-            modelValue.value = Number.isNaN(res) ? Number(o) : res
-
-            ctx.emit('update:value', modelValue.value)
+        watchEffect(() => {
+            modelValue.value = props.value
         })
 
         return {
-            modelValue
+            modelValue,
+            change () {
+                const value = Number(modelValue.value)
+
+                if (Number.isNaN(value)) {
+                    return
+                }
+
+                ctx.emit('update:value', value)
+            }
         }
     }
 })

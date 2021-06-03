@@ -1,7 +1,7 @@
 <template>
     <a-input
         v-model:value="modelValue"
-        :value="value"
+        @change="change"
     />
 </template>
 
