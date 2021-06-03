@@ -3,7 +3,7 @@ import {
     importComponents,
     createWithdrawal,
     initProps,
-    isSaveKeydown, componentList, componentNames
+    isSaveKeydown, componentList, componentNames, registerWindowKeyDown, skipPushWithdrawal
 } from './helper'
 import { EditComponent, ImportComponent } from '@/views/edit/types'
 import { cloneDeep } from 'lodash'
@@ -14,14 +14,6 @@ import ColorPicker from './components/colorPicker/index.vue'
 import MyInput from './components/input/index.vue'
 
 const components = ref<EditComponent[]>([])
-
-// function getComponentById (id: EditComponent['id']) {
-//     for (const a of components.value) {
-//         if (a.id === id) {
-//             return a
-//         }
-//     }
-// }
 
 const borderStyleOptions = [
     {
@@ -51,6 +43,8 @@ const borderStyleOptions = [
 type UseComponent = ReturnType<typeof useComponent>
 
 type UseDrag = ReturnType<typeof useDrag>
+
+type UseCanvas = ReturnType<typeof useCanvasPanel>
 
 // component
 function useComponent () {
@@ -180,44 +174,6 @@ function useSelect (component: UseComponent, drag: UseDrag) {
         selectComponentId.value = undefined
     }
 
-    function registerKeydown (e: KeyboardEvent) {
-        if (!selectComponent.value) {
-            return
-        }
-
-        const target = e.target as HTMLElement | null
-        if (target && target.tagName.toLowerCase() === 'input') {
-            return
-        }
-
-        const key = e.key.toLowerCase()
-        const isArrowUp = key === 'arrowup'
-        const isArrowDown = key === 'arrowdown'
-        const isArrowLeft = key === 'arrowleft'
-        const isArrowRight = key === 'arrowright'
-        const isDel = key === 'delete'
-
-        let value = 1
-
-        if (e.shiftKey) {
-            value = 10
-        }
-
-        const props = selectComponent.value.props
-
-        if (isArrowUp) {
-            props.top -= value
-        } else if (isArrowDown) {
-            props.top += value
-        } else if (isArrowLeft) {
-            props.left -= value
-        } else if (isArrowRight) {
-            props.left += value
-        } else if (isDel) {
-            component.remove(selectComponent.value)
-        }
-    }
-
     const selectProps = computed(() => {
         if (!selectComponent.value) return
 
@@ -250,8 +206,7 @@ function useSelect (component: UseComponent, drag: UseDrag) {
         select,
         noSelect,
         selectProps,
-        selectComponent,
-        registerKeydown
+        selectComponent
     })
 }
 
@@ -277,16 +232,8 @@ function useCanvasPanel () {
     }
     getData()
 
-    function registerKeydown (e: KeyboardEvent) {
-        if (isSaveKeydown(e)) {
-            e.preventDefault()
-            saveData()
-        }
-    }
-
     return {
-        saveData,
-        registerKeydown
+        saveData
     }
 }
 
@@ -313,16 +260,10 @@ function usePropPanel () {
 // 回撤
 function useWithdrawal () {
     const withdrawal = createWithdrawal<EditComponent[]>()
-
-    const skipWatch = ref(false)
+    registerWindowKeyDown(withdrawal.registerKeydown)
 
     function watchComponents () {
         watch(components, () => {
-            if (skipWatch.value) {
-                skipWatch.value = false
-                return
-            }
-
             withdrawal.push(cloneDeep(components.value))
         }, {
             deep: true
@@ -331,7 +272,7 @@ function useWithdrawal () {
         function update (data: EditComponent[]) {
             components.value = cloneDeep(data)
 
-            skipWatch.value = true
+            skipPushWithdrawal.value = true
         }
 
         withdrawal.onRevoke(update)
@@ -339,6 +280,59 @@ function useWithdrawal () {
     }
 
     watchComponents()
+}
+
+function useSaveKeydown (e: KeyboardEvent, canvas: UseCanvas) {
+    console.log(e)
+
+    if (isSaveKeydown(e)) {
+        e.preventDefault()
+
+        canvas.saveData()
+    }
+}
+
+function useDelKeydown (e: KeyboardEvent, component: UseComponent) {
+    if (!selectComponent.value) {
+        return
+    }
+
+    const key = e.key.toLowerCase()
+    const isDel = key === 'delete'
+
+    if (isDel) {
+        component.remove(selectComponent.value)
+    }
+}
+
+function useArrowKeydown (e: KeyboardEvent) {
+    if (!selectComponent.value) {
+        return
+    }
+
+    const key = e.key.toLowerCase()
+    const isArrowUp = key === 'arrowup'
+    const isArrowDown = key === 'arrowdown'
+    const isArrowLeft = key === 'arrowleft'
+    const isArrowRight = key === 'arrowright'
+
+    let value = 1
+
+    if (e.shiftKey) {
+        value = 10
+    }
+
+    const props = selectComponent.value.props
+
+    if (isArrowUp) {
+        props.top -= value
+    } else if (isArrowDown) {
+        props.top += value
+    } else if (isArrowLeft) {
+        props.left -= value
+    } else if (isArrowRight) {
+        props.left += value
+    }
 }
 
 export default defineComponent({
@@ -356,6 +350,14 @@ export default defineComponent({
         const propPanel = usePropPanel()
 
         useWithdrawal()
+
+        registerWindowKeyDown(useArrowKeydown)
+        registerWindowKeyDown((e) => {
+            useSaveKeydown(e, canvasPanel)
+        })
+        registerWindowKeyDown((e) => {
+            useDelKeydown(e, component)
+        })
 
         return {
             drag,

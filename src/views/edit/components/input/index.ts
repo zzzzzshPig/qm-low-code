@@ -1,4 +1,5 @@
 import { defineComponent, ref, watchEffect } from 'vue'
+import { isRestoreKeydown, isRevokeKeydown, skipPushWithdrawal } from '@/views/edit/helper'
 
 export default defineComponent({
     props: {
@@ -25,6 +26,11 @@ export default defineComponent({
                 }
 
                 ctx.emit('update:value', value)
+            },
+            keydown (e: KeyboardEvent) {
+                if (isRestoreKeydown(e) || isRevokeKeydown(e)) {
+                    skipPushWithdrawal.value = true
+                }
             }
         }
     }

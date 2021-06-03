@@ -1,6 +1,6 @@
 import { Image, Text, Block } from 'qm-lowCode-component'
 import { useDebounce } from '@/utils'
-import { reactive } from 'vue'
+import { reactive, onUnmounted } from 'vue'
 import { BasePropTypeKeys, ComponentListItem, EditComponent, ImportComponent, PropValueType } from './types'
 import imageSvg from './images/image.svg'
 import textSvg from './images/text.svg'
@@ -37,6 +37,13 @@ export const componentList: ComponentListItem[] = [
     }
 ]
 
+export function registerWindowKeyDown (cb: (e: KeyboardEvent, ...arg: never[]) => void) {
+    window.addEventListener('keydown', cb)
+    onUnmounted(() => {
+        window.removeEventListener('keydown', cb)
+    })
+}
+
 const isMacOs = navigator.platform.toLowerCase().includes('mac')
 
 export function isSaveKeydown (e: KeyboardEvent) {
@@ -44,6 +51,18 @@ export function isSaveKeydown (e: KeyboardEvent) {
     const handler = isMacOs ? e.metaKey : e.ctrlKey
 
     return handler && key === 's'
+}
+
+export function isRevokeKeydown (e: KeyboardEvent) {
+    const handler = isMacOs ? e.metaKey : e.ctrlKey
+
+    return handler && e.key.toLowerCase() === 'z'
+}
+
+export function isRestoreKeydown (e: KeyboardEvent) {
+    const handler = isMacOs ? e.metaKey : e.ctrlKey
+
+    return handler && e.key.toLowerCase() === 'z' && e.shiftKey
 }
 
 export function initProps (component: ImportComponent) {
@@ -62,6 +81,9 @@ function convertProps (props: ImportComponent['props']) {
     return Object.fromEntries(res.entries()) as EditComponent['props']
 }
 
+export const skipPushWithdrawal = {
+    value: false
+}
 // 撤销与回撤功能
 export function createWithdrawal<T> () {
     const queue: Array<T> = []
@@ -73,18 +95,12 @@ export function createWithdrawal<T> () {
     let step = 0
 
     function registerKeydown (e: KeyboardEvent) {
-        const isZ = e.key.toLowerCase() === 'z'
-
-        if (e.metaKey && isZ) {
-            e.preventDefault()
-
-            if (e.shiftKey) {
-                console.log('callRestore')
-                callRestore()
-            } else {
-                console.log('callRevoke')
-                callRevoke()
-            }
+        if (isRestoreKeydown(e)) {
+            console.log('callRestore')
+            callRestore()
+        } else if (isRevokeKeydown(e)) {
+            console.log('callRevoke')
+            callRevoke()
         }
     }
 
@@ -123,6 +139,11 @@ export function createWithdrawal<T> () {
     // 保存撤销的回调
     const debounce = useDebounce()
     function push (data: T, customDelay = delay) {
+        if (skipPushWithdrawal.value) {
+            skipPushWithdrawal.value = false
+            return
+        }
+
         debounce.apply(() => {
             // 超出最大深度
             if (queue.length > depth) {
