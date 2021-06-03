@@ -9,9 +9,7 @@
 
 <style lang="less" scoped>
     .text-component {
-        overflow-x: hidden;
-        white-space: nowrap;
-        text-overflow: initial;
+        word-break: break-all;
     }
 </style>
 
