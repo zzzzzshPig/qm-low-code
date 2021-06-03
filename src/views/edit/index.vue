@@ -42,22 +42,22 @@
                 @dragover.prevent
                 @mousemove="drag.move"
             >
-                <component
-                    :is="item.name"
+                <div
                     v-for="item in components"
                     :key="item.id"
-                    v-bind="item.props"
-                    @click.stop
-                    @mousedown.stop="select.select($event, item)"
-                />
+                >
+                    <component
+                        :is="item.name"
+                        v-bind="item.props"
+                    />
 
-                <div
-                    v-if="select.selectComponent"
-                    :style="select.selectStyle"
-                    class="cover"
-                    @click.stop
-                    @mousedown="select.select($event, select.selectComponent)"
-                />
+                    <div
+                        :style="select.selectStyle(item)"
+                        class="cover"
+                        @click.stop
+                        @mousedown="select.select($event, item)"
+                    />
+                </div>
             </div>
         </div>
 

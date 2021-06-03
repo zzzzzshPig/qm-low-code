@@ -224,12 +224,11 @@ function useSelect (component: UseComponent, drag: UseDrag) {
         return selectComponent.value.props
     })
 
-    const selectStyle = computed(() => {
-        if (!selectComponent.value) return
+    function selectStyle (item: EditComponent) {
+        const props = item.props
 
-        const props = selectComponent.value.props
-
-        return {
+        const res = {
+            opacity: 1,
             zIndex: props.zIndex,
             position: 'absolute',
             width: `${props.width}px`,
@@ -238,7 +237,13 @@ function useSelect (component: UseComponent, drag: UseDrag) {
             left: `${props.left}px`,
             transform: `rotate(${props.rotate}deg)`
         }
-    })
+
+        if (selectComponentId.value !== item.id) {
+            res.opacity = 0
+        }
+
+        return res
+    }
 
     return reactive({
         selectStyle,
@@ -355,7 +360,6 @@ export default defineComponent({
         return {
             drag,
             select,
-            MyInput,
             propPanel,
             components,
             componentList,
