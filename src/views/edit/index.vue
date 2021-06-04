@@ -20,6 +20,7 @@
                 @dragend="drag.restore"
             >
                 <img
+                    class="image"
                     :src="item.image"
                     alt=""
                 >
@@ -64,6 +65,7 @@
         <div
             v-if="select.selectProps"
             class="prop-list"
+            @keydown.stop="select.keydown"
             @click.stop
         >
             <div class="leftRightWidthHeight">
@@ -224,7 +226,7 @@
                 class="font"
             >
                 <div class="title">
-                    文字
+                    文本
                 </div>
 
                 <div class="box">
@@ -256,7 +258,7 @@
                         </div>
 
                         <MyInput
-                            v-model:value="select.selectProps.font"
+                            v-model:value="select.selectProps.lineHeight"
                             class="input"
                         />
                     </div>
@@ -297,6 +299,50 @@
                         v-model:value="select.selectProps.src"
                         class="block"
                     />
+                </div>
+            </div>
+
+            <div
+                v-if="propPanel.showInput"
+                class="font"
+            >
+                <div class="title">
+                    输入框
+                </div>
+
+                <div class="item-line">
+                    <div class="label">
+                        id
+                    </div>
+
+                    <a-input v-model:value="select.selectProps.id" />
+                </div>
+
+                <div class="item-line">
+                    <div class="label">
+                        提示文字
+                    </div>
+
+                    <a-input v-model:value="select.selectProps.placeholder" />
+                </div>
+
+                <div class="item-line">
+                    <div class="label">
+                        类型
+                    </div>
+
+                    <a-select
+                        v-model:value="select.selectProps.inputType"
+                        class="select"
+                    >
+                        <a-select-option
+                            v-for="item in inputTypeOptions"
+                            :key="item.value"
+                            :value="item.value"
+                        >
+                            {{ item.label }}
+                        </a-select-option>
+                    </a-select>
                 </div>
             </div>
         </div>
@@ -366,6 +412,7 @@
             .image {
                 width: 48px;
                 height: 48px;
+                -webkit-user-drag: none;
             }
         }
     }

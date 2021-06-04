@@ -26,11 +26,6 @@ export default defineComponent({
                 }
 
                 ctx.emit('update:value', value)
-            },
-            keydown (e: KeyboardEvent) {
-                if (isRestoreKeydown(e) || isRevokeKeydown(e)) {
-                    skipPushWithdrawal.value = true
-                }
             }
         }
     }

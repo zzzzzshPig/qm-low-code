@@ -1,15 +1,18 @@
 <template>
     <a-input
+        :id="id"
+        v-model:value="modelValue"
         class="input-component"
         :style="baseStyle"
-        :value="text"
-        :type="type"
+        :type="inputType"
+        :placeholder="placeholder"
+        @change="change"
     />
 </template>
 
 <style lang="less" scoped>
-    .text-component {
-        word-break: break-all;
+    .input-component {
+        transition: none;
     }
 </style>
 

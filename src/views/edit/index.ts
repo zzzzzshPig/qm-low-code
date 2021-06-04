@@ -3,7 +3,13 @@ import {
     importComponents,
     createWithdrawal,
     initProps,
-    isSaveKeydown, componentList, componentNames, registerWindowKeyDown, skipPushWithdrawal
+    isSaveKeydown,
+    componentList,
+    componentNames,
+    registerWindowKeyDown,
+    skipPushWithdrawal,
+    isRestoreKeydown,
+    isRevokeKeydown
 } from './helper'
 import { EditComponent, ImportComponent } from '@/views/edit/types'
 import { cloneDeep } from 'lodash'
@@ -37,6 +43,19 @@ const borderStyleOptions = [
     }, {
         value: 'ridge',
         label: '浮雕效果'
+    }
+]
+
+const inputTypeOptions = [
+    {
+        value: 'text',
+        label: '文字'
+    }, {
+        value: 'number',
+        label: '数字'
+    }, {
+        value: 'tel',
+        label: '电话'
     }
 ]
 
@@ -206,7 +225,12 @@ function useSelect (component: UseComponent, drag: UseDrag) {
         select,
         noSelect,
         selectProps,
-        selectComponent
+        selectComponent,
+        keydown (e: KeyboardEvent) {
+            if (isRestoreKeydown(e) || isRevokeKeydown(e)) {
+                skipPushWithdrawal.value = true
+            }
+        }
     })
 }
 
@@ -244,16 +268,21 @@ function usePropPanel () {
     })
 
     const showFont = computed(() => {
-        return [componentNames.text].includes(name.value)
+        return [componentNames.text, componentNames.Input].includes(name.value)
     })
 
     const showImage = computed(() => {
         return [componentNames.image].includes(name.value)
     })
 
+    const showInput = computed(() => {
+        return [componentNames.Input].includes(name.value)
+    })
+
     return reactive({
         showFont,
-        showImage
+        showImage,
+        showInput
     })
 }
 
@@ -283,8 +312,6 @@ function useWithdrawal () {
 }
 
 function useSaveKeydown (e: KeyboardEvent, canvas: UseCanvas) {
-    console.log(e)
-
     if (isSaveKeydown(e)) {
         e.preventDefault()
 
@@ -366,7 +393,8 @@ export default defineComponent({
             components,
             componentList,
             save: canvasPanel.saveData,
-            borderStyleOptions
+            borderStyleOptions,
+            inputTypeOptions
         }
     }
 })

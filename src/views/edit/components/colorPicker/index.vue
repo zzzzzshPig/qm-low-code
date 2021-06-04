@@ -1,5 +1,6 @@
 <template>
     <a-popover
+        :get-popup-container="getPopupContainer"
         placement="left"
         overlay-class-name="popover-color-picker"
         trigger="click"
@@ -15,6 +16,7 @@
         </template>
 
         <div
+            ref="node"
             class="btn-show"
             :style="{
                 backgroundColor: value

@@ -1,4 +1,4 @@
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { ColorPicker } from 'vue-color-kit'
 import 'vue-color-kit/dist/vue-color-kit.css'
 
@@ -14,9 +14,21 @@ export default defineComponent({
     },
     emits: ['update:value'],
     setup (props, ctx) {
+        const node = ref(null)
+
         return {
+            node,
             change ({ rgba: { a, b, g, r } }: never) {
                 ctx.emit('update:value', `rgba(${r}, ${g}, ${b}, ${a})`)
+            },
+            getPopupContainer () {
+                const dom = node.value as never as HTMLElement
+
+                if (!dom) {
+                    return
+                }
+
+                return dom.parentNode
             }
         }
     }
