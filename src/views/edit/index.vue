@@ -38,7 +38,6 @@
             <div
                 tabindex="-1"
                 class="canvas"
-                @click.stop="select.noSelect"
                 @drop="drag.end"
                 @dragover.prevent
                 @mousemove="drag.move"
@@ -68,100 +67,101 @@
             @keydown.stop="select.keydown"
             @click.stop
         >
-            <div class="leftRightWidthHeight">
-                <div class="item">
-                    <div class="label">
-                        Left
+            <div class="prop-block">
+                <div class="box">
+                    <div class="item">
+                        <div class="label">
+                            Left
+                        </div>
+
+                        <MyInput
+                            v-model:value="select.selectProps.left"
+                            class="input"
+                        />
                     </div>
 
-                    <MyInput
-                        v-model:value="select.selectProps.left"
-                        class="input"
-                    />
-                </div>
+                    <div class="item">
+                        <div class="label">
+                            Top
+                        </div>
 
-                <div class="item">
-                    <div class="label">
-                        Top
+                        <MyInput
+                            v-model:value="select.selectProps.top"
+                            class="input"
+                        />
                     </div>
 
-                    <MyInput
-                        v-model:value="select.selectProps.top"
-                        class="input"
-                    />
-                </div>
+                    <div class="item">
+                        <div class="label">
+                            Width
+                        </div>
 
-                <div class="item">
-                    <div class="label">
-                        Width
+                        <MyInput
+                            v-model:value="select.selectProps.width"
+                            class="input"
+                        />
                     </div>
 
-                    <MyInput
-                        v-model:value="select.selectProps.width"
-                        class="input"
-                    />
+                    <div class="item">
+                        <div class="label">
+                            Height
+                        </div>
+
+                        <MyInput
+                            v-model:value="select.selectProps.height"
+                            class="input"
+                        />
+                    </div>
                 </div>
 
-                <div class="item">
-                    <div class="label">
-                        Height
+                <div class="box">
+                    <div class="item">
+                        <div class="label">
+                            旋转
+                        </div>
+
+                        <MyInput
+                            v-model:value="select.selectProps.rotate"
+                            class="input"
+                        />
                     </div>
 
-                    <MyInput
-                        v-model:value="select.selectProps.height"
-                        class="input"
-                    />
-                </div>
-            </div>
+                    <div class="item">
+                        <div class="label">
+                            不透明度
+                        </div>
 
-            <div class="rotateOpacityZIndex">
-                <div class="item">
-                    <div class="label">
-                        旋转
+                        <MyInput
+                            v-model:value="select.selectProps.opacity"
+                            class="input"
+                        />
                     </div>
 
-                    <MyInput
-                        v-model:value="select.selectProps.rotate"
-                        class="input"
-                    />
-                </div>
+                    <div class="item">
+                        <div class="label">
+                            层级
+                        </div>
 
-                <div class="item">
-                    <div class="label">
-                        不透明度
+                        <MyInput
+                            v-model:value="select.selectProps.zIndex"
+                            class="input"
+                        />
                     </div>
-
-                    <MyInput
-                        v-model:value="select.selectProps.opacity"
-                        class="input"
-                    />
                 </div>
 
-                <div class="item">
-                    <div class="label">
-                        层级
-                    </div>
-
-                    <MyInput
-                        v-model:value="select.selectProps.zIndex"
-                        class="input"
-                    />
-                </div>
-            </div>
-
-            <div class="background">
-                <div class="item">
+                <div class="item-line">
                     <div class="label">
                         背景颜色
                     </div>
 
                     <color-picker
                         v-model:value="select.selectProps.backgroundColor"
+                        class="color"
                     />
                 </div>
             </div>
 
-            <div class="border">
+            <div class="prop-block">
                 <div class="title">
                     边框
                 </div>
@@ -196,7 +196,7 @@
 
                         <color-picker
                             v-model:value="select.selectProps.borderColor"
-                            class="input"
+                            class="color"
                         />
                     </div>
                 </div>
@@ -208,7 +208,7 @@
 
                     <a-select
                         v-model:value="select.selectProps.borderStyle"
-                        class="select"
+                        class="input"
                     >
                         <a-select-option
                             v-for="item in borderStyleOptions"
@@ -223,7 +223,7 @@
 
             <div
                 v-if="propPanel.showFont"
-                class="font"
+                class="prop-block"
             >
                 <div class="title">
                     文本
@@ -262,6 +262,17 @@
                             class="input"
                         />
                     </div>
+
+                    <div class="item">
+                        <div class="label">
+                            字间距
+                        </div>
+
+                        <MyInput
+                            v-model:value="select.selectProps.letterSpacing"
+                            class="input"
+                        />
+                    </div>
                 </div>
 
                 <div class="item-line">
@@ -271,6 +282,7 @@
 
                     <color-picker
                         v-model:value="select.selectProps.color"
+                        class="color"
                     />
                 </div>
 
@@ -281,59 +293,73 @@
 
                     <a-textarea
                         v-model:value="select.selectProps.text"
+                        class="input"
                         type="textarea"
                     />
                 </div>
             </div>
 
             <div
-                v-if="propPanel.showImage"
-                class="image"
+                v-if="propPanel.showComponentProps"
+                class="prop-block"
             >
-                <div class="item">
+                <div class="title">
+                    组件属性
+                </div>
+
+                <div
+                    v-if="propPanel.showImage"
+                    class="item-line"
+                >
                     <div class="label">
                         图片地址
                     </div>
 
                     <a-input
                         v-model:value="select.selectProps.src"
-                        class="block"
+                        class="input"
                     />
                 </div>
-            </div>
 
-            <div
-                v-if="propPanel.showInput"
-                class="font"
-            >
-                <div class="title">
-                    输入框
-                </div>
-
-                <div class="item-line">
+                <div
+                    v-if="propPanel.showInput"
+                    class="item-line"
+                >
                     <div class="label">
                         id
                     </div>
 
-                    <a-input v-model:value="select.selectProps.id" />
+                    <a-input
+                        v-model:value="select.selectProps.id"
+                        class="input"
+                    />
                 </div>
 
-                <div class="item-line">
+                <div
+                    v-if="propPanel.showInput"
+                    class="item-line"
+                >
                     <div class="label">
                         提示文字
                     </div>
 
-                    <a-input v-model:value="select.selectProps.placeholder" />
+                    <a-input
+                        v-model:value="select.selectProps.placeholder"
+                        class="input"
+                    />
                 </div>
 
-                <div class="item-line">
+                <div
+                    v-if="propPanel.showInput"
+                    class="item-line"
+                >
                     <div class="label">
                         类型
                     </div>
 
                     <a-select
                         v-model:value="select.selectProps.inputType"
-                        class="select"
+                        class="input"
                     >
                         <a-select-option
                             v-for="item in inputTypeOptions"
@@ -426,7 +452,7 @@
         padding: 8px 16px;
         border-left: 1px solid rgba(0, 0, 0, .1);
 
-        .leftRightWidthHeight, .rotateOpacityZIndex, .border, .background, .font, .image {
+        .prop-block {
             padding: 8px 0;
             border-bottom: 1px solid rgba(0, 0, 0, .1);
 
@@ -437,6 +463,7 @@
 
             .box {
                 .flex-align-center-justify-between;
+                margin-bottom: 8px;
 
                 ::v-deep {
                     .btn-show {
@@ -446,15 +473,25 @@
             }
 
             .item-line {
-                margin-top: 8px;
+                .flex-align-center;
+                margin-top: 16px;
 
                 .label {
+                    width: 60px;
+                    flex-shrink: 0;
+                    margin-top: 4px;
                     margin-right: 8px;
                     margin-bottom: 4px;
                 }
 
-                .select {
+                .input {
                     width: 100%;
+                }
+
+                ::v-deep {
+                    .color {
+                        width: 88px;
+                    }
                 }
             }
 
@@ -476,33 +513,7 @@
                     padding: 0;
                     text-align: center;
                 }
-
-                .block {
-                    width: 100%;
-                }
             }
-        }
-
-        .background, .image {
-            .item .label {
-                text-align: left;
-            }
-        }
-
-        .border {
-            .item-line {
-                .select {
-                    width: 100%;
-                }
-            }
-        }
-
-        .rotateOpacityZIndex {
-            .flex-align-center-justify-between;
-        }
-
-        .leftRightWidthHeight {
-            .flex-align-center-justify-between;
         }
     }
 </style>

@@ -1,5 +1,5 @@
-import { stringProp, numberProp, baseProps, cmtBaseStyle } from '../helper'
-import { computed, defineComponent, ref, watchEffect } from 'vue'
+import { stringProp, numberProp, baseProps, textProps, cmtTextPropStyle } from '../helper'
+import { defineComponent, ref, watchEffect } from 'vue'
 
 function getInputId () {
     return `myInput${Date.now()}`
@@ -9,13 +9,8 @@ export default defineComponent({
     name: 'ZInput',
 
     props: {
-        ...baseProps(),
+        ...textProps(),
         height: numberProp(32),
-        text: stringProp(''),
-        color: stringProp(),
-        fontSize: numberProp(16),
-        fontWeight: numberProp(400),
-        lineHeight: numberProp(24),
         inputType: stringProp('text'),
         id: stringProp(getInputId()),
         placeholder: stringProp('请输入'),
@@ -24,8 +19,6 @@ export default defineComponent({
         borderStyle: stringProp('solid'),
         borderRadius: numberProp(2)
     },
-
-    emits: ['update:value'],
 
     setup (props) {
         const modelValue = ref(props.text)
@@ -45,15 +38,7 @@ export default defineComponent({
         return {
             modelValue,
 
-            baseStyle: computed(() => {
-                return {
-                    ...cmtBaseStyle(props).value,
-                    fontSize: `${props.fontSize}px`,
-                    color: props.color,
-                    fontWeight: props.fontWeight,
-                    lineHeight: `${props.lineHeight}px`
-                }
-            }),
+            baseStyle: cmtTextPropStyle(props),
 
             change
         }

@@ -21,6 +21,17 @@ export function booleanProp (value = false) {
     }
 }
 
+export function textProps () {
+    return {
+        text: stringProp(''),
+        color: stringProp(),
+        fontSize: numberProp(14),
+        fontWeight: numberProp(400),
+        lineHeight: numberProp(20),
+        letterSpacing: numberProp()
+    }
+}
+
 export function baseProps () {
     return {
         opacity: numberProp(100),
@@ -62,6 +73,19 @@ export function cmtBaseStyle (props: {
             borderColor: props.borderColor,
             borderStyle: props.borderStyle,
             transform: `rotate(${props.rotate}deg)`
+        }
+    })
+}
+
+// eslint-disable-next-line
+export function cmtTextPropStyle (props: any) {
+    return computed(() => {
+        return {
+            ...baseProps(),
+            fontSize: `${props.fontSize}px`,
+            color: props.color,
+            fontWeight: props.fontWeight,
+            lineHeight: `${props.lineHeight}px`
         }
     })
 }

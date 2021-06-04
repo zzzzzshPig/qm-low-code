@@ -268,7 +268,7 @@ function usePropPanel () {
     })
 
     const showFont = computed(() => {
-        return [componentNames.text, componentNames.Input].includes(name.value)
+        return [componentNames.text, componentNames.input, componentNames.button].includes(name.value)
     })
 
     const showImage = computed(() => {
@@ -276,13 +276,18 @@ function usePropPanel () {
     })
 
     const showInput = computed(() => {
-        return [componentNames.Input].includes(name.value)
+        return [componentNames.input].includes(name.value)
+    })
+
+    const showComponentProps = computed(() => {
+        return [componentNames.image, componentNames.input, componentNames.button].includes(name.value)
     })
 
     return reactive({
         showFont,
         showImage,
-        showInput
+        showInput,
+        showComponentProps
     })
 }
 
