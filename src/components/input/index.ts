@@ -1,4 +1,4 @@
-import { stringProp, numberProp, baseProps, textProps, cmtTextPropStyle } from '../helper'
+import { stringProp, numberProp, textProps, cmtTextPropStyle } from '../helper'
 import { defineComponent, ref, watchEffect } from 'vue'
 
 function getInputId () {

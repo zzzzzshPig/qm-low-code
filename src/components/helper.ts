@@ -23,6 +23,7 @@ export function booleanProp (value = false) {
 
 export function textProps () {
     return {
+        ...baseProps(),
         text: stringProp(''),
         color: stringProp(),
         fontSize: numberProp(14),
@@ -81,7 +82,7 @@ export function cmtBaseStyle (props: {
 export function cmtTextPropStyle (props: any) {
     return computed(() => {
         return {
-            ...baseProps(),
+            ...cmtBaseStyle(props).value,
             fontSize: `${props.fontSize}px`,
             color: props.color,
             fontWeight: props.fontWeight,

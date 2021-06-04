@@ -156,7 +156,7 @@
 
                     <color-picker
                         v-model:value="select.selectProps.backgroundColor"
-                        class="color"
+                        class="input-color"
                     />
                 </div>
             </div>
@@ -196,7 +196,6 @@
 
                         <color-picker
                             v-model:value="select.selectProps.borderColor"
-                            class="color"
                         />
                     </div>
                 </div>
@@ -282,7 +281,7 @@
 
                     <color-picker
                         v-model:value="select.selectProps.color"
-                        class="color"
+                        class="input-color"
                     />
                 </div>
 
@@ -489,7 +488,7 @@
                 }
 
                 ::v-deep {
-                    .color {
+                    .input-color {
                         width: 88px;
                     }
                 }
