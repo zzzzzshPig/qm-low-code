@@ -279,6 +279,10 @@ function usePropPanel () {
         return [componentNames.input].includes(name.value)
     })
 
+    const showButton = computed(() => {
+        return [componentNames.button].includes(name.value)
+    })
+
     const showComponentProps = computed(() => {
         return [componentNames.image, componentNames.input, componentNames.button].includes(name.value)
     })
@@ -287,6 +291,7 @@ function usePropPanel () {
         showFont,
         showImage,
         showInput,
+        showButton,
         showComponentProps
     })
 }

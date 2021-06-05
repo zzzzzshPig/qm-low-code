@@ -369,6 +369,48 @@
                         </a-select-option>
                     </a-select>
                 </div>
+
+                <div
+                    v-if="propPanel.showButton"
+                    class="item-line"
+                >
+                    <div class="label">
+                        输入框id
+                    </div>
+
+                    <a-input
+                        v-model:value="select.selectProps.inputId"
+                        class="input"
+                        placeholder="输入框的id属性"
+                    />
+                </div>
+
+                <div
+                    v-if="propPanel.showButton"
+                    class="item-line"
+                >
+                    <div class="label">
+                        楼盘id
+                    </div>
+
+                    <a-input
+                        v-model:value="select.selectProps.houseId"
+                        class="input"
+                    />
+                </div>
+
+                <div
+                    v-if="propPanel.showButton"
+                    class="item-line"
+                >
+                    <div class="label">
+                        短信验证
+                    </div>
+
+                    <a-checkbox
+                        v-model:checked="select.selectProps.shouldMsgCode"
+                    />
+                </div>
             </div>
         </div>
     </div>

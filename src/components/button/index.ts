@@ -1,4 +1,4 @@
-import { numberProp, textProps, stringProp, cmtTextPropStyle } from '../helper'
+import { numberProp, textProps, stringProp, cmtTextPropStyle, booleanProp } from '../helper'
 import { defineComponent } from 'vue'
 
 export default defineComponent({
@@ -9,7 +9,9 @@ export default defineComponent({
         text: stringProp('按钮'),
         height: numberProp(32),
         borderRadius: numberProp(2),
-        inputId: stringProp()
+        inputId: stringProp(),
+        houseId: numberProp(),
+        shouldMsgCode: booleanProp()
     },
 
     setup (props) {
