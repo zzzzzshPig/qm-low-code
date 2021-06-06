@@ -1,4 +1,4 @@
-import { baseProps } from 'qm-lowCode-component'
+import { baseProps } from 'qm-low-code-component'
 
 export type BasePropType = ReturnType<typeof baseProps>
 

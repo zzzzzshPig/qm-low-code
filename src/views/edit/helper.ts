@@ -1,4 +1,4 @@
-import { Image, Text, Block, Input, Button, Link } from 'qm-lowCode-component'
+import { Block, Input, Button, Link, Image, Text } from 'qm-low-code-component'
 import { useDebounce } from '@/utils'
 import { reactive, onUnmounted } from 'vue'
 import { BasePropTypeKeys, ComponentListItem, EditComponent, ImportComponent, PropValueType } from './types'

@@ -12,6 +12,7 @@
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "loadsh": "^0.0.4",
+    "qm-low-code-component": "https://github.com/zzzzzshPig/qm-low-code-component.git",
     "vue": "^3.0.0",
     "vue-color-kit": "^1.0.3",
     "vue-router": "^4.0.0-0",

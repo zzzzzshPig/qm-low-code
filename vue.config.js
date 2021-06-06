@@ -10,14 +10,6 @@ module.exports = {
         }
     },
 
-    configureWebpack: {
-        resolve: {
-            alias: {
-                'qm-lowCode-component': path.resolve(__dirname, 'src/components')
-            }
-        }
-    },
-
     pluginOptions: {
         'style-resources-loader': {
             preProcessor: 'less',
