@@ -395,6 +395,7 @@
 
                     <a-input
                         v-model:value="select.selectProps.houseId"
+                        placeholder="填单会算到此楼盘"
                         class="input"
                     />
                 </div>
@@ -410,6 +411,42 @@
                     <a-checkbox
                         v-model:checked="select.selectProps.shouldMsgCode"
                     />
+                </div>
+
+                <div
+                    v-if="propPanel.showLink"
+                    class="item-line"
+                >
+                    <div class="label">
+                        链接地址
+                    </div>
+
+                    <a-input
+                        v-model:value="select.selectProps.href"
+                        class="input"
+                    />
+                </div>
+
+                <div
+                    v-if="propPanel.showLink"
+                    class="item-line"
+                >
+                    <div class="label">
+                        跳转方式
+                    </div>
+
+                    <a-select
+                        v-model:value="select.selectProps.target"
+                        class="input"
+                    >
+                        <a-select-option
+                            v-for="item in linkTargetOptions"
+                            :key="item.value"
+                            :value="item.value"
+                        >
+                            {{ item.label }}
+                        </a-select-option>
+                    </a-select>
                 </div>
             </div>
         </div>

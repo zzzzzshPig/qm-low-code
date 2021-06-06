@@ -1,5 +1,5 @@
 import { baseProps, cmtBaseStyle, stringProp } from '../helper'
-import { computed, defineComponent } from 'vue'
+import { defineComponent } from 'vue'
 
 export default defineComponent({
     name: 'ZBlock',
@@ -11,12 +11,7 @@ export default defineComponent({
 
     setup (props) {
         return {
-            baseStyle: computed(() => {
-                return {
-                    ...cmtBaseStyle(props).value,
-                    backgroundColor: props.backgroundColor
-                }
-            })
+            baseStyle: cmtBaseStyle(props)
         }
     }
 })

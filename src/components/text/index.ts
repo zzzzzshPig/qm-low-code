@@ -1,4 +1,4 @@
-import { numberProp, textProps, cmtTextPropStyle } from '../helper'
+import { numberProp, textProps, cmtTextPropStyle, stringProp } from '../helper'
 import { defineComponent } from 'vue'
 
 export default defineComponent({
@@ -6,7 +6,8 @@ export default defineComponent({
 
     props: {
         ...textProps(),
-        height: numberProp(24)
+        height: numberProp(20),
+        text: stringProp('这是一个文本框')
     },
 
     setup (props) {

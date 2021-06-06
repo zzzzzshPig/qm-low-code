@@ -1,4 +1,4 @@
-import { Image, Text, Block, Input, Button } from 'qm-lowCode-component'
+import { Image, Text, Block, Input, Button, Link } from 'qm-lowCode-component'
 import { useDebounce } from '@/utils'
 import { reactive, onUnmounted } from 'vue'
 import { BasePropTypeKeys, ComponentListItem, EditComponent, ImportComponent, PropValueType } from './types'
@@ -7,13 +7,15 @@ import textSvg from './images/text.svg'
 import blockSvg from './images/block.svg'
 import inputSvg from './images/input.svg'
 import buttonSvg from './images/button.svg'
+import linkSvg from './images/link.svg'
 
 export const componentNames = {
     image: Image.name,
     text: Text.name,
     block: Block.name,
     input: Input.name,
-    button: Button.name
+    button: Button.name,
+    link: Link.name
 }
 
 export const importComponents = {
@@ -21,7 +23,8 @@ export const importComponents = {
     [componentNames.text]: Text,
     [componentNames.block]: Block,
     [componentNames.input]: Input,
-    [componentNames.button]: Button
+    [componentNames.button]: Button,
+    [componentNames.link]: Link
 }
 
 export const componentList: ComponentListItem[] = [
@@ -50,6 +53,11 @@ export const componentList: ComponentListItem[] = [
         label: '按钮',
         image: buttonSvg,
         props: Button.props
+    }, {
+        name: componentNames.link,
+        label: '超链接',
+        image: linkSvg,
+        props: Link.props
     }
 ]
 

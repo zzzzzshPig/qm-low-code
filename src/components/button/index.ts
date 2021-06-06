@@ -9,6 +9,9 @@ export default defineComponent({
         text: stringProp('按钮'),
         height: numberProp(32),
         borderRadius: numberProp(2),
+        borderStyle: stringProp('solid'),
+        borderWidth: numberProp(1),
+        borderColor: stringProp('#d9d9d9'),
         inputId: stringProp(),
         houseId: numberProp(),
         shouldMsgCode: booleanProp()

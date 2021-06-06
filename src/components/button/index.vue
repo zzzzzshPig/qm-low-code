@@ -10,6 +10,7 @@
 <style lang="less" scoped>
     .button-component {
         transition: none;
+        box-shadow: none;
     }
 </style>
 

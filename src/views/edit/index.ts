@@ -59,6 +59,16 @@ const inputTypeOptions = [
     }
 ]
 
+const linkTargetOptions = [
+    {
+        value: '_blank',
+        label: '新窗口'
+    }, {
+        value: '_self',
+        label: '当前页面'
+    }
+]
+
 type UseComponent = ReturnType<typeof useComponent>
 
 type UseDrag = ReturnType<typeof useDrag>
@@ -268,7 +278,7 @@ function usePropPanel () {
     })
 
     const showFont = computed(() => {
-        return [componentNames.text, componentNames.input, componentNames.button].includes(name.value)
+        return [componentNames.text, componentNames.input, componentNames.button, componentNames.link].includes(name.value)
     })
 
     const showImage = computed(() => {
@@ -283,8 +293,12 @@ function usePropPanel () {
         return [componentNames.button].includes(name.value)
     })
 
+    const showLink = computed(() => {
+        return [componentNames.link].includes(name.value)
+    })
+
     const showComponentProps = computed(() => {
-        return [componentNames.image, componentNames.input, componentNames.button].includes(name.value)
+        return [componentNames.image, componentNames.input, componentNames.button, componentNames.link].includes(name.value)
     })
 
     return reactive({
@@ -292,6 +306,7 @@ function usePropPanel () {
         showImage,
         showInput,
         showButton,
+        showLink,
         showComponentProps
     })
 }
@@ -404,7 +419,8 @@ export default defineComponent({
             componentList,
             save: canvasPanel.saveData,
             borderStyleOptions,
-            inputTypeOptions
+            inputTypeOptions,
+            linkTargetOptions
         }
     }
 })

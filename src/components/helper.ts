@@ -86,7 +86,8 @@ export function cmtTextPropStyle (props: any) {
             fontSize: `${props.fontSize}px`,
             color: props.color,
             fontWeight: props.fontWeight,
-            lineHeight: `${props.lineHeight}px`
+            lineHeight: `${props.lineHeight}px`,
+            letterSpacing: `${props.letterSpacing}px`
         }
     })
 }
