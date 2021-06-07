@@ -7570,9 +7570,9 @@ q@^1.1.2:
   resolved "https://registry.npm.taobao.org/q/download/q-1.5.1.tgz#7e32f75b41381291d04611f1bf14109ac00651d7"
   integrity sha1-fjL3W0E4EpHQRhHxvxQQmsAGUdc=
 
-"qm-low-code-component@https://github.com/zzzzzshPig/qm-low-code-component.git":
+"qm-low-code-component@https://gitlab.malmam.com/qm/qm-low-code-component.git":
   version "0.0.1"
-  resolved "https://github.com/zzzzzshPig/qm-low-code-component.git#4dd71c3538660efc1f774baf48d90ccead992af8"
+  resolved "https://gitlab.malmam.com/qm/qm-low-code-component.git#cba36be3805057e7a313c6e503a1e89baf2faeab"
 
 qs@6.7.0:
   version "6.7.0"
