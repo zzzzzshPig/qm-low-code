@@ -1,7 +1,7 @@
 import { App } from 'vue'
-import { Button, Input, InputNumber, Select, Popover, Checkbox } from 'ant-design-vue'
+import { Button, Input, Select, Popover, Checkbox } from 'ant-design-vue'
 
-const components = [Input, Button, InputNumber, Select, Popover, Checkbox]
+const components = [Input, Button, Select, Popover, Checkbox]
 
 export default (app: App<Element>) => {
     components.forEach(a => {

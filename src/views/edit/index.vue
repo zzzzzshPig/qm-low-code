@@ -306,6 +306,7 @@
                     组件属性
                 </div>
 
+                <!-- 图片相关 -->
                 <div
                     v-if="propPanel.showImage"
                     class="item-line"
@@ -320,6 +321,7 @@
                     />
                 </div>
 
+                <!-- 输入框相关 -->
                 <div
                     v-if="propPanel.showInput"
                     class="item-line"
@@ -370,6 +372,7 @@
                     </a-select>
                 </div>
 
+                <!-- 按钮相关 -->
                 <div
                     v-if="propPanel.showButton"
                     class="item-line"
@@ -393,7 +396,7 @@
                         楼盘id
                     </div>
 
-                    <a-input
+                    <MyInput
                         v-model:value="select.selectProps.houseId"
                         placeholder="填单会算到此楼盘"
                         class="input"
@@ -413,6 +416,52 @@
                     />
                 </div>
 
+                <div
+                    v-if="propPanel.showButton"
+                    class="item-line"
+                >
+                    <div class="label">
+                        弹窗标题
+                    </div>
+
+                    <a-input
+                        v-model:value="select.selectProps.buttonTitle"
+                        placeholder="点击后弹窗标题"
+                        class="input"
+                    />
+                </div>
+
+                <div
+                    v-if="propPanel.showButton"
+                    class="item-line"
+                >
+                    <div class="label">
+                        弹窗正文
+                    </div>
+
+                    <a-input
+                        v-model:value="select.selectProps.buttonTip"
+                        placeholder="点击后弹窗正文"
+                        class="input"
+                    />
+                </div>
+
+                <div
+                    v-if="propPanel.showButton"
+                    class="item-line"
+                >
+                    <div class="label">
+                        弹窗按钮
+                    </div>
+
+                    <a-input
+                        v-model:value="select.selectProps.buttonBtnText"
+                        placeholder="点击后弹窗按钮文字"
+                        class="input"
+                    />
+                </div>
+
+                <!-- 超链接相关 -->
                 <div
                     v-if="propPanel.showLink"
                     class="item-line"
