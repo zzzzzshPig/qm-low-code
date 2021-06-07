@@ -61,6 +61,22 @@ export const componentList: ComponentListItem[] = [
     }
 ]
 
+export function openWin (url: string, target: string) {
+    const a = document.createElement('a')
+    const id = '___false_click'
+
+    a.setAttribute('href', url)
+    a.setAttribute('target', target)
+    a.setAttribute('id', id)
+
+    // 防止反复添加
+    if (!document.getElementById(id)) {
+        document.body.appendChild(a)
+    }
+
+    a.click()
+}
+
 export function registerWindowKeyDown (cb: (e: KeyboardEvent, ...arg: never[]) => void) {
     window.addEventListener('keydown', cb)
     onUnmounted(() => {

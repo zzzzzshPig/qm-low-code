@@ -10,6 +10,29 @@
             保存
         </a-button>
 
+        <a-button
+            class="btn-preview"
+            @click.stop="preview"
+        >
+            预览
+        </a-button>
+
+        <a-button
+            disabled
+            class="btn-prepublish"
+            @click.stop="prepublish"
+        >
+            预发布
+        </a-button>
+
+        <a-button
+            disabled
+            class="btn-publish"
+            @click.stop="publish"
+        >
+            发布
+        </a-button>
+
         <div class="component-list">
             <div
                 v-for="item in componentList"
@@ -36,7 +59,6 @@
             @click="select.noSelect"
         >
             <div
-                tabindex="-1"
                 class="canvas"
                 @drop="drag.end"
                 @dragover.prevent
@@ -503,10 +525,25 @@
 </template>
 
 <style scoped lang="less">
-    .btn-save {
+    .btn-save, .btn-preview, .btn-publish, .btn-prepublish {
         position: absolute;
         top: 16px;
-        right: 288px;
+
+        &.btn-save {
+            right: 288px;
+        }
+
+        &.btn-preview {
+            right: 368px;
+        }
+
+        &.btn-prepublish {
+            right: 448px;
+        }
+
+        &.btn-publish {
+            right: 538px;
+        }
     }
 
     .main {
@@ -530,6 +567,24 @@
             border: 1px solid rgba(0, 0, 0, .1);
             transform: translateX(-50%);
             box-sizing: content-box;
+
+            /*滚动条样式*/
+            &::-webkit-scrollbar {/*滚动条整体样式*/
+                width:4px;/*高宽分别对应横竖滚动条的尺寸*/
+                height:4px;
+            }
+
+            &::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+                border-radius:5px;
+                -webkit-box-shadow: inset005pxrgba(0,0,0,0.2);
+                background:rgba(0,0,0,0.2);
+            }
+
+            &::-webkit-scrollbar-track {/*滚动条里面轨道*/
+                -webkit-box-shadow: inset005pxrgba(0,0,0,0.2);
+                border-radius:0;
+                background:rgba(0,0,0,0.1);
+            }
 
             .cover {
                 margin-top: -2px;

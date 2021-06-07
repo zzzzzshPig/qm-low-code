@@ -9,7 +9,7 @@ import {
     registerWindowKeyDown,
     skipPushWithdrawal,
     isRestoreKeydown,
-    isRevokeKeydown
+    isRevokeKeydown, openWin
 } from './helper'
 import { EditComponent, ImportComponent } from '@/views/edit/types'
 import { cloneDeep } from 'lodash'
@@ -20,6 +20,18 @@ import ColorPicker from './components/colorPicker/index.vue'
 import MyInput from './components/input/index.vue'
 
 const components = ref<EditComponent[]>([])
+
+const maxZIndex = computed(() => {
+    let res = -Infinity
+
+    for (const a of components.value) {
+        if (a.props.zIndex > res) {
+            res = a.props.zIndex
+        }
+    }
+
+    return res
+})
 
 const borderStyleOptions = [
     {
@@ -134,9 +146,15 @@ function useDrag (component: UseComponent) {
             return
         }
 
+        const canvas = document.querySelector('.canvas') as HTMLDivElement
+
+        console.log(canvas.offsetTop, canvas.offsetLeft, e)
+
         const c = component.add(dragItem)
-        c.props.top = e.offsetY - c.props.height / 2
-        c.props.left = e.offsetX - c.props.width / 2
+        c.props.top = e.clientY - canvas.offsetTop - c.props.height / 2
+        c.props.left = e.clientX - canvas.offsetLeft - c.props.width / 2
+
+        c.props.zIndex = maxZIndex.value + 1
 
         selectComponentId.value = c.id
     }
@@ -387,6 +405,26 @@ function useArrowKeydown (e: KeyboardEvent) {
     }
 }
 
+function useAction () {
+    function preview () {
+        openWin('http://192.168.1.66/market_activity_dev/123', '_blank')
+    }
+
+    function publish () {
+        console.log('1')
+    }
+
+    function prepublish () {
+        console.log('1')
+    }
+
+    return {
+        preview,
+        publish,
+        prepublish
+    }
+}
+
 export default defineComponent({
     components: {
         ...importComponents,
@@ -417,10 +455,11 @@ export default defineComponent({
             propPanel,
             components,
             componentList,
-            save: canvasPanel.saveData,
             borderStyleOptions,
             inputTypeOptions,
-            linkTargetOptions
+            linkTargetOptions,
+            save: canvasPanel.saveData,
+            ...useAction()
         }
     }
 })
