@@ -9,7 +9,8 @@ import {
     registerWindowKeyDown,
     skipPushWithdrawal,
     isRestoreKeydown,
-    isRevokeKeydown, openWin
+    isRevokeKeydown,
+    openWin
 } from './helper'
 import { EditComponent, ImportComponent } from '@/views/edit/types'
 import { cloneDeep } from 'lodash'
@@ -147,12 +148,11 @@ function useDrag (component: UseComponent) {
         }
 
         const canvas = document.querySelector('.canvas') as HTMLDivElement
-
-        console.log(canvas.offsetTop, canvas.offsetLeft, e)
+        const canvasBound = canvas.getBoundingClientRect()
 
         const c = component.add(dragItem)
-        c.props.top = e.clientY - canvas.offsetTop - c.props.height / 2
-        c.props.left = e.clientX - canvas.offsetLeft - c.props.width / 2
+        c.props.top = e.clientY - canvasBound.top - c.props.height / 2
+        c.props.left = e.clientX - canvasBound.left - c.props.width / 2
 
         c.props.zIndex = maxZIndex.value + 1
 
@@ -405,9 +405,13 @@ function useArrowKeydown (e: KeyboardEvent) {
     }
 }
 
-function useAction () {
-    function preview () {
-        openWin('http://192.168.1.66/market_activity_dev/123', '_blank')
+function useAction (canvas: UseCanvas) {
+    async function preview () {
+        await canvas.saveData()
+
+        setTimeout(() => {
+            openWin('http://192.168.1.66/market_activity_dev/123', '_blank')
+        }, 1000)
     }
 
     function publish () {
@@ -459,7 +463,7 @@ export default defineComponent({
             inputTypeOptions,
             linkTargetOptions,
             save: canvasPanel.saveData,
-            ...useAction()
+            ...useAction(canvasPanel)
         }
     }
 })
