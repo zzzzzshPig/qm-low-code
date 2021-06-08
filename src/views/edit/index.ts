@@ -151,9 +151,9 @@ function useDrag (component: UseComponent) {
         const canvasBound = canvas.getBoundingClientRect()
 
         const c = component.add(dragItem)
-        c.props.top = e.clientY - canvasBound.top - c.props.height / 2
-        c.props.left = e.clientX - canvasBound.left - c.props.width / 2
 
+        c.props.top = e.clientY - canvasBound.top + canvas.scrollTop - c.props.height / 2
+        c.props.left = e.clientX - canvasBound.left - c.props.width / 2
         c.props.zIndex = maxZIndex.value + 1
 
         selectComponentId.value = c.id
@@ -166,17 +166,24 @@ function useDrag (component: UseComponent) {
     let editComponent: null | EditComponent = null
     let initTop = 0
     let initLeft = 0
+    let delayTime = 0
 
     function moveStart (e: MouseEvent, item: EditComponent) {
         initTop = e.clientY
         initLeft = e.clientX
         editComponent = item
+        delayTime = Date.now()
 
         document.addEventListener('mouseup', moveEnd)
     }
 
     function move (e: MouseEvent) {
         if (!editComponent) {
+            return
+        }
+
+        // 短时间start - move无效
+        if (Date.now() - delayTime < 100) {
             return
         }
 
@@ -406,11 +413,17 @@ function useArrowKeydown (e: KeyboardEvent) {
 }
 
 function useAction (canvas: UseCanvas) {
+    const route = useRoute()
+
+    function save () {
+        return canvas.saveData()
+    }
+
     async function preview () {
-        await canvas.saveData()
+        await save()
 
         setTimeout(() => {
-            openWin('http://192.168.1.66/market_activity_dev/123', '_blank')
+            openWin(`http://192.168.1.66/market_activity_dev/${route.params.id}`, '_blank')
         }, 1000)
     }
 
@@ -419,14 +432,15 @@ function useAction (canvas: UseCanvas) {
     }
 
     async function prepublish () {
-        await canvas.saveData()
+        await save()
 
         setTimeout(() => {
-            openWin('http://192.168.1.66/market_activity_staging/123', '_blank')
+            openWin(`http://192.168.1.66/market_activity_staging/${route.params.id}`, '_blank')
         }, 1000)
     }
 
     return {
+        save,
         preview,
         publish,
         prepublish
@@ -466,8 +480,7 @@ export default defineComponent({
             borderStyleOptions,
             inputTypeOptions,
             linkTargetOptions,
-            save: canvasPanel.saveData,
-            ...useAction(canvasPanel)
+            action: useAction(canvasPanel)
         }
     }
 })

@@ -5,21 +5,21 @@
         <a-button
             type="primary"
             class="btn-save"
-            @click.stop="save"
+            @click.stop="action.save"
         >
             保存
         </a-button>
 
         <a-button
             class="btn-preview"
-            @click.stop="preview"
+            @click.stop="action.preview"
         >
             预览
         </a-button>
 
         <a-button
             class="btn-prepublish"
-            @click.stop="prepublish"
+            @click.stop="action.prepublish"
         >
             预发布
         </a-button>
@@ -27,7 +27,7 @@
         <a-button
             disabled
             class="btn-publish"
-            @click.stop="publish"
+            @click.stop="action.publish"
         >
             发布
         </a-button>
