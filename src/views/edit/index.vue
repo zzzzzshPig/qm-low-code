@@ -18,7 +18,6 @@
         </a-button>
 
         <a-button
-            disabled
             class="btn-prepublish"
             @click.stop="prepublish"
         >

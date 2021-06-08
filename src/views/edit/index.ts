@@ -418,8 +418,12 @@ function useAction (canvas: UseCanvas) {
         console.log('1')
     }
 
-    function prepublish () {
-        console.log('1')
+    async function prepublish () {
+        await canvas.saveData()
+
+        setTimeout(() => {
+            openWin('http://192.168.1.66/market_activity_staging/123', '_blank')
+        }, 1000)
     }
 
     return {
