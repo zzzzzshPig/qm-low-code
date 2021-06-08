@@ -77,7 +77,52 @@
                         class="cover"
                         @click.stop
                         @mousedown="select.select($event, item)"
-                    />
+                    >
+                        <div
+                            v-if="select.selectComponent"
+                            class="dots"
+                        >
+                            <div
+                                class="dot leftTop"
+                                @mousedown.stop="scale.scale($event, item, [1, 1, -1, -1])"
+                            />
+
+                            <div
+                                class="dot top"
+                                @mousedown.stop="scale.scale($event, item, [1, 0, 0, -1])"
+                            />
+
+                            <div
+                                class="dot rightTop"
+                                @mousedown.stop="scale.scale($event, item, [1, 0, 1, -1])"
+                            />
+
+                            <div
+                                class="dot right"
+                                @mousedown.stop="scale.scale($event, item, [0, 0, 1, 0])"
+                            />
+
+                            <div
+                                class="dot rightBottom"
+                                @mousedown.stop="scale.scale($event, item, [0, 0, 1, 1])"
+                            />
+
+                            <div
+                                class="dot bottom"
+                                @mousedown.stop="scale.scale($event, item, [0, 0, 0, 1])"
+                            />
+
+                            <div
+                                class="dot leftBottom"
+                                @mousedown.stop="scale.scale($event, item, [0, 1, -1, 1])"
+                            />
+
+                            <div
+                                class="dot left"
+                                @mousedown.stop="scale.scale($event, item, [0, 1, -1, 0])"
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -591,6 +636,67 @@
                 border: 2px solid #1090ff;
                 box-sizing: content-box;
                 cursor: pointer;
+
+                .dot {
+                    position: absolute;
+                    width: 6px;
+                    height: 6px;
+                    background: #fff;
+                    border: 1px solid #1090ff;
+                    border-radius: 50%;
+
+                    &.leftTop {
+                        top: -4px;
+                        left: -4px;
+                        cursor: nwse-resize;
+                    }
+
+                    &.top {
+                        top: -4px;
+                        left: 50%;
+                        margin-left: -3px;
+                        cursor: ns-resize;
+                    }
+
+                    &.rightTop {
+                        top: -4px;
+                        right: -4px;
+                        cursor: nesw-resize;
+                    }
+
+                    &.right {
+                        top: 50%;
+                        right: -4px;
+                        margin-top: -3px;
+                        cursor: ew-resize;
+                    }
+
+                    &.rightBottom {
+                        right: -4px;
+                        bottom: -4px;
+                        cursor: nwse-resize;
+                    }
+
+                    &.bottom {
+                        bottom: -4px;
+                        left: 50%;
+                        margin-left: -3px;
+                        cursor: ns-resize;
+                    }
+
+                    &.leftBottom {
+                        left: -4px;
+                        bottom: -4px;
+                        cursor: nesw-resize;
+                    }
+
+                    &.left {
+                        top: 50%;
+                        left: -4px;
+                        margin-top: -3px;
+                        cursor: ew-resize;
+                    }
+                }
             }
         }
     }

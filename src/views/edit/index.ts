@@ -212,6 +212,58 @@ function useDrag (component: UseComponent) {
     }
 }
 
+function useScale () {
+    function scale (e: MouseEvent, item: EditComponent, vector: Array<1 | -1 | 0>) {
+        const sX = e.clientX
+        const sY = e.clientY
+        const props = item.props
+        const sTop = props.top
+        const sLeft = props.left
+        const sWidth = props.width
+        const sHeight = props.height
+        const canTop = vector[0]
+        const canLeft = vector[1]
+        const canWidth = vector[2]
+        const canHeight = vector[3]
+
+        function mousemove (e: MouseEvent) {
+            const nX = e.clientX
+            const nY = e.clientY
+
+            if (canWidth) {
+                props.width = Math.max(0, sWidth + (nX - sX) * canWidth)
+            }
+
+            if (canHeight) {
+                props.height = Math.max(0, sHeight + (nY - sY) * canHeight)
+            }
+
+            if (canTop) {
+                props.top = sTop + nY - sY
+                props.top = canTop ? Math.min(props.top, sTop + sHeight) : Math.max(props.top, sTop)
+            }
+
+            if (canLeft) {
+                props.left = sLeft + nX - sX
+                props.left = canLeft ? Math.min(props.left, sLeft + sWidth) : Math.max(props.left, sLeft)
+            }
+        }
+
+        function mouseup () {
+            document.removeEventListener('mousemove', mousemove)
+            document.removeEventListener('mouseup', mouseup)
+        }
+
+        document.addEventListener('mousemove', mousemove)
+
+        document.addEventListener('mouseup', mouseup)
+    }
+
+    return {
+        scale
+    }
+}
+
 const selectComponentId = ref<number>()
 
 const selectComponent = computed<EditComponent | undefined>(() => {
@@ -480,7 +532,8 @@ export default defineComponent({
             borderStyleOptions,
             inputTypeOptions,
             linkTargetOptions,
-            action: useAction(canvasPanel)
+            action: useAction(canvasPanel),
+            scale: useScale()
         }
     }
 })
