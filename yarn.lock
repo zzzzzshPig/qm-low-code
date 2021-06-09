@@ -7572,7 +7572,7 @@ q@^1.1.2:
 
 "qm-low-code-component@https://gitlab.malmam.com/qm/qm-low-code-component.git":
   version "0.0.1"
-  resolved "https://gitlab.malmam.com/qm/qm-low-code-component.git#ea71280a3dc81ed11ebcdb197a870393635883dc"
+  resolved "https://gitlab.malmam.com/qm/qm-low-code-component.git#1b98302898881f84439638d1e10bc08e8d712e78"
 
 qs@6.7.0:
   version "6.7.0"
