@@ -56,73 +56,22 @@
         <div
             class="canvas-box"
             @click="select.noSelect"
+            @mousedown="check.mousedown"
         >
             <div
                 class="canvas"
                 @drop="drag.end"
                 @dragover.prevent
-                @mousemove="drag.move"
             >
                 <div
                     v-for="item in components"
                     :key="item.id"
+                    @mousedown.stop="select.select($event, item)"
                 >
                     <component
                         :is="item.name"
                         v-bind="item.props"
                     />
-
-                    <div
-                        :style="select.selectStyle(item)"
-                        class="cover"
-                        @click.stop
-                        @mousedown="select.select($event, item)"
-                    >
-                        <div
-                            v-if="select.selectComponent"
-                            class="dots"
-                        >
-                            <div
-                                class="dot leftTop"
-                                @mousedown.stop="scale.scale($event, item, [1, 1, -1, -1])"
-                            />
-
-                            <div
-                                class="dot top"
-                                @mousedown.stop="scale.scale($event, item, [1, 0, 0, -1])"
-                            />
-
-                            <div
-                                class="dot rightTop"
-                                @mousedown.stop="scale.scale($event, item, [1, 0, 1, -1])"
-                            />
-
-                            <div
-                                class="dot right"
-                                @mousedown.stop="scale.scale($event, item, [0, 0, 1, 0])"
-                            />
-
-                            <div
-                                class="dot rightBottom"
-                                @mousedown.stop="scale.scale($event, item, [0, 0, 1, 1])"
-                            />
-
-                            <div
-                                class="dot bottom"
-                                @mousedown.stop="scale.scale($event, item, [0, 0, 0, 1])"
-                            />
-
-                            <div
-                                class="dot leftBottom"
-                                @mousedown.stop="scale.scale($event, item, [0, 1, -1, 1])"
-                            />
-
-                            <div
-                                class="dot left"
-                                @mousedown.stop="scale.scale($event, item, [0, 1, -1, 0])"
-                            />
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -131,6 +80,66 @@
                 alt=""
                 class="bg"
             >
+
+            <div
+                :style="check.style"
+                class="check-box"
+            />
+
+            <div
+                :style="check.boxStyle"
+                :class="{
+                    'component-check-box': select.selectComponent.length > 1,
+                    'component-select-box': select.selectComponent.length === 1
+                }"
+                @mousedown.stop="drag.moveStart($event)"
+                @click.stop
+            >
+                <div
+                    v-if="select.selectComponent"
+                    class="dots"
+                >
+                    <div
+                        class="dot leftTop"
+                        @mousedown.stop="scale.scale($event, [1, 1, -1, -1])"
+                    />
+
+                    <div
+                        class="dot top"
+                        @mousedown.stop="scale.scale($event, [1, 0, 0, -1])"
+                    />
+
+                    <div
+                        class="dot rightTop"
+                        @mousedown.stop="scale.scale($event, [1, 0, 1, -1])"
+                    />
+
+                    <div
+                        class="dot right"
+                        @mousedown.stop="scale.scale($event, [0, 0, 1, 0])"
+                    />
+
+                    <div
+                        class="dot rightBottom"
+                        @mousedown.stop="scale.scale($event, [0, 0, 1, 1])"
+                    />
+
+                    <div
+                        class="dot bottom"
+                        @mousedown.stop="scale.scale($event, [0, 0, 0, 1])"
+                    />
+
+                    <div
+                        class="dot leftBottom"
+                        @mousedown.stop="scale.scale($event, [0, 1, -1, 1])"
+                    />
+
+                    <div
+                        class="dot left"
+                        @mousedown.stop="scale.scale($event, [0, 1, -1, 0])"
+                    />
+                </div>
+            </div>
         </div>
 
         <div
@@ -603,8 +612,19 @@
     }
 
     .canvas-box {
+        .relative;
+        z-index: 0;
         width: 100%;
         height: 100%;
+        user-select: none;
+
+        .check-box {
+            z-index: 999999999999999999999;
+            position: absolute;
+            background: rgba(100, 170, 255, 0.1);
+            border: 1px solid rgba(0, 0, 0, .4);
+            box-sizing: border-box;
+        }
 
         .canvas {
             z-index: 1;
@@ -635,75 +655,6 @@
                 border-radius:0;
                 background:rgba(0,0,0,0.1);
             }
-
-            .cover {
-                margin-top: -2px;
-                margin-left: -2px;
-                border: 2px solid #1090ff;
-                box-sizing: content-box;
-                cursor: pointer;
-
-                .dot {
-                    position: absolute;
-                    width: 6px;
-                    height: 6px;
-                    background: #fff;
-                    border: 1px solid #1090ff;
-                    border-radius: 50%;
-
-                    &.leftTop {
-                        top: -4px;
-                        left: -4px;
-                        cursor: nwse-resize;
-                    }
-
-                    &.top {
-                        top: -4px;
-                        left: 50%;
-                        margin-left: -3px;
-                        cursor: ns-resize;
-                    }
-
-                    &.rightTop {
-                        top: -4px;
-                        right: -4px;
-                        cursor: nesw-resize;
-                    }
-
-                    &.right {
-                        top: 50%;
-                        right: -4px;
-                        margin-top: -3px;
-                        cursor: ew-resize;
-                    }
-
-                    &.rightBottom {
-                        right: -4px;
-                        bottom: -4px;
-                        cursor: nwse-resize;
-                    }
-
-                    &.bottom {
-                        bottom: -4px;
-                        left: 50%;
-                        margin-left: -3px;
-                        cursor: ns-resize;
-                    }
-
-                    &.leftBottom {
-                        left: -4px;
-                        bottom: -4px;
-                        cursor: nesw-resize;
-                    }
-
-                    &.left {
-                        top: 50%;
-                        left: -4px;
-                        margin-top: -3px;
-                        cursor: ew-resize;
-                    }
-                }
-            }
         }
 
         .bg {
@@ -713,11 +664,85 @@
             width: 436px;
             height: 881px;
             transform: translateX(-50%);
+            -webkit-user-drag: none;
+        }
+
+        .component-check-box, .component-select-box {
+            z-index: 999999999999999999999;
+            position: absolute;
+            border: 1px dashed #808080;
+            cursor: move;
+
+            &.component-select-box {
+                border: 2px solid #1090ff;
+            }
+
+            .dot {
+                position: absolute;
+                width: 6px;
+                height: 6px;
+                background: #fff;
+                border: 1px solid #1090ff;
+                border-radius: 50%;
+
+                &.leftTop {
+                    top: -4px;
+                    left: -4px;
+                    cursor: nwse-resize;
+                }
+
+                &.top {
+                    top: -4px;
+                    left: 50%;
+                    margin-left: -3px;
+                    cursor: ns-resize;
+                }
+
+                &.rightTop {
+                    top: -4px;
+                    right: -4px;
+                    cursor: nesw-resize;
+                }
+
+                &.right {
+                    top: 50%;
+                    right: -4px;
+                    margin-top: -3px;
+                    cursor: ew-resize;
+                }
+
+                &.rightBottom {
+                    right: -4px;
+                    bottom: -4px;
+                    cursor: nwse-resize;
+                }
+
+                &.bottom {
+                    bottom: -4px;
+                    left: 50%;
+                    margin-left: -3px;
+                    cursor: ns-resize;
+                }
+
+                &.leftBottom {
+                    left: -4px;
+                    bottom: -4px;
+                    cursor: nesw-resize;
+                }
+
+                &.left {
+                    top: 50%;
+                    left: -4px;
+                    margin-top: -3px;
+                    cursor: ew-resize;
+                }
+            }
         }
     }
 
     .component-list {
         .flex-align-start-wrap-justify-between;
+        z-index: 1;
         align-content: flex-start;
         position: absolute;
         top: 0;
@@ -725,6 +750,7 @@
         width: 228px;
         height: 100%;
         padding: 16px;
+        background: #fff;
         border-right: 1px solid rgba(0, 0, 0, .1);
 
         .item {
@@ -746,12 +772,14 @@
     }
 
     .prop-list {
+        z-index: 1;
         position: absolute;
         top: 0;
         right: 0;
         width: 270px;
         height: 100%;
         padding: 8px 16px;
+        background: #fff;
         border-left: 1px solid rgba(0, 0, 0, .1);
 
         .prop-block {

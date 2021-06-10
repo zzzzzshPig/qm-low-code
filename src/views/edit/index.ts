@@ -88,6 +88,22 @@ type UseDrag = ReturnType<typeof useDrag>
 
 type UseCanvas = ReturnType<typeof useCanvasPanel>
 
+function getCanvasDom () {
+    const canvas = document.querySelector('.canvas') as HTMLDivElement | null
+
+    if (!canvas) {
+        return {
+            canvas: canvas,
+            boundClientRect: null
+        }
+    }
+
+    return {
+        canvas,
+        boundClientRect: canvas.getBoundingClientRect()
+    }
+}
+
 // component
 function useComponent () {
     const uid = computed(() => {
@@ -135,6 +151,107 @@ function useComponent () {
     }
 }
 
+function useCheck () {
+    const style = reactive({
+        width: 0,
+        height: 0,
+        top: 0,
+        left: 0
+    })
+
+    const componentStyle = reactive({
+        width: 0,
+        height: 0,
+        top: 0,
+        left: 0
+    })
+
+    function mousedown (e: MouseEvent) {
+        const sX = e.pageX
+        const sY = e.pageY
+        const sTop = sY
+        const sLeft = sX
+        const { boundClientRect } = getCanvasDom()
+
+        function mousemove (e: MouseEvent) {
+            if (!boundClientRect) {
+                return
+            }
+
+            style.top = e.clientY - sY > 0 ? sTop : sTop + e.clientY - sY
+            style.left = e.clientX - sX > 0 ? sLeft : sLeft + e.clientX - sX
+            style.width = Math.abs(sX - e.clientX)
+            style.height = Math.abs(sY - e.clientY)
+
+            selectComponent.value = components.value.filter(a => {
+                let { left, top, width, height } = a.props
+                left += boundClientRect.x
+                top += boundClientRect.y
+
+                // 右侧大于左侧 左侧小于右侧 顶部小于底部 底部大于顶部
+                if ((style.left + style.width) > left && style.left < (left + width) && style.top < (top + height) && (style.top + style.height) > top) {
+                    return a
+                }
+            })
+
+            notNoSelect = true
+        }
+
+        function mouseup () {
+            style.width = 0
+            style.height = 0
+            style.top = 0
+            style.left = 0
+
+            document.removeEventListener('mouseup', mouseup)
+            document.removeEventListener('mousemove', mousemove)
+        }
+
+        document.addEventListener('mousemove', mousemove)
+        document.addEventListener('mouseup', mouseup)
+    }
+
+    return reactive({
+        mousedown,
+
+        style: computed(() => {
+            return {
+                width: style.width + 'px',
+                height: style.height + 'px',
+                top: style.top + 'px',
+                left: style.left + 'px'
+            }
+        }),
+
+        boxStyle: computed(() => {
+            const { boundClientRect } = getCanvasDom()
+
+            if (!selectComponent.value || !boundClientRect) {
+                return
+            }
+
+            componentStyle.top = 0
+            componentStyle.left = 0
+            componentStyle.width = 0
+            componentStyle.height = 0
+
+            selectComponent.value.forEach(a => {
+                componentStyle.top = componentStyle.top ? Math.min(a.props.top, componentStyle.top) : a.props.top
+                componentStyle.left = componentStyle.left ? Math.min(a.props.left, componentStyle.left) : a.props.left
+                componentStyle.width = componentStyle.width ? Math.max(a.props.left + a.props.width, componentStyle.width) : a.props.left + a.props.width
+                componentStyle.height = componentStyle.height ? Math.max(a.props.top + a.props.height, componentStyle.height) : a.props.top + a.props.height
+            })
+
+            return {
+                top: componentStyle.top + boundClientRect.top + 'px',
+                left: componentStyle.left + boundClientRect.left + 'px',
+                width: componentStyle.width - componentStyle.left + 'px',
+                height: componentStyle.height - componentStyle.top + 'px'
+            }
+        })
+    })
+}
+
 function useDrag (component: UseComponent) {
     let dragItem: null | ImportComponent = null
 
@@ -147,41 +264,37 @@ function useDrag (component: UseComponent) {
             return
         }
 
-        const canvas = document.querySelector('.canvas') as HTMLDivElement
-        const canvasBound = canvas.getBoundingClientRect()
+        const { canvas, boundClientRect } = getCanvasDom()
+
+        if (!boundClientRect || !canvas) {
+            return
+        }
 
         const c = component.add(dragItem)
 
-        c.props.top = e.clientY - canvasBound.top + canvas.scrollTop - c.props.height / 2
-        c.props.left = e.clientX - canvasBound.left - c.props.width / 2
+        c.props.top = e.clientY - boundClientRect.top + canvas.scrollTop - c.props.height / 2
+        c.props.left = e.clientX - boundClientRect.left - c.props.width / 2
         c.props.zIndex = maxZIndex.value + 1
-
-        selectComponentId.value = c.id
     }
 
     function restore () {
         dragItem = null
     }
 
-    let editComponent: null | EditComponent = null
     let initTop = 0
     let initLeft = 0
     let delayTime = 0
 
-    function moveStart (e: MouseEvent, item: EditComponent) {
+    function moveStart (e: MouseEvent) {
         initTop = e.clientY
         initLeft = e.clientX
-        editComponent = item
         delayTime = Date.now()
 
         document.addEventListener('mouseup', moveEnd)
+        document.addEventListener('mousemove', move)
     }
 
     function move (e: MouseEvent) {
-        if (!editComponent) {
-            return
-        }
-
         // 短时间start - move无效
         if (Date.now() - delayTime < 100) {
             return
@@ -190,37 +303,32 @@ function useDrag (component: UseComponent) {
         const nowTop = e.clientY
         const nowLeft = e.clientX
 
-        editComponent.props.top += nowTop - initTop
-        editComponent.props.left += nowLeft - initLeft
+        selectComponent.value.forEach(a => {
+            a.props.top += nowTop - initTop
+            a.props.left += nowLeft - initLeft
+        })
 
         initTop = nowTop
         initLeft = nowLeft
     }
 
     function moveEnd () {
-        editComponent = null
-
         document.removeEventListener('mouseup', moveEnd)
+        document.removeEventListener('mousemove', move)
     }
 
     return {
         start,
         end,
-        move,
         restore,
         moveStart
     }
 }
 
 function useScale () {
-    function scale (e: MouseEvent, item: EditComponent, vector: Array<1 | -1 | 0>) {
-        const sX = e.clientX
-        const sY = e.clientY
-        const props = item.props
-        const sTop = props.top
-        const sLeft = props.left
-        const sWidth = props.width
-        const sHeight = props.height
+    function scale (e: MouseEvent, vector: Array<1 | -1 | 0>) {
+        let sX = e.clientX
+        let sY = e.clientY
         const canTop = vector[0]
         const canLeft = vector[1]
         const canWidth = vector[2]
@@ -230,23 +338,34 @@ function useScale () {
             const nX = e.clientX
             const nY = e.clientY
 
-            if (canWidth) {
-                props.width = Math.max(0, sWidth + (nX - sX) * canWidth)
-            }
+            selectComponent.value.forEach(a => {
+                const props = a.props
+                const sTop = props.top
+                const sLeft = props.left
+                const sWidth = props.width
+                const sHeight = props.height
 
-            if (canHeight) {
-                props.height = Math.max(0, sHeight + (nY - sY) * canHeight)
-            }
+                if (canWidth) {
+                    props.width = Math.max(0, sWidth + (nX - sX) * canWidth)
+                }
 
-            if (canTop) {
-                props.top = sTop + nY - sY
-                props.top = canTop ? Math.min(props.top, sTop + sHeight) : Math.max(props.top, sTop)
-            }
+                if (canHeight) {
+                    props.height = Math.max(0, sHeight + (nY - sY) * canHeight)
+                }
 
-            if (canLeft) {
-                props.left = sLeft + nX - sX
-                props.left = canLeft ? Math.min(props.left, sLeft + sWidth) : Math.max(props.left, sLeft)
-            }
+                if (canTop) {
+                    props.top = sTop + nY - sY
+                    props.top = canTop ? Math.min(props.top, sTop + sHeight) : Math.max(props.top, sTop)
+                }
+
+                if (canLeft) {
+                    props.left = sLeft + nX - sX
+                    props.left = canLeft ? Math.min(props.left, sLeft + sWidth) : Math.max(props.left, sLeft)
+                }
+            })
+
+            sX = nX
+            sY = nY
         }
 
         function mouseup () {
@@ -264,51 +383,35 @@ function useScale () {
     }
 }
 
-const selectComponentId = ref<number>()
+const selectComponent = ref<EditComponent[]>([])
 
-const selectComponent = computed<EditComponent | undefined>(() => {
-    return components.value.filter(a => a.id === selectComponentId.value)[0]
-})
+let notNoSelect = false
 
 function useSelect (component: UseComponent, drag: UseDrag) {
     function select (e: MouseEvent, component: EditComponent) {
-        selectComponentId.value = component.id
-        drag.moveStart(e, component)
+        selectComponent.value = [component]
+
+        notNoSelect = true
+
+        drag.moveStart(e)
     }
 
     function noSelect () {
-        selectComponentId.value = undefined
+        if (notNoSelect) {
+            notNoSelect = false
+            return
+        }
+
+        selectComponent.value = []
     }
 
     const selectProps = computed(() => {
-        if (!selectComponent.value) return
+        if (!selectComponent.value.length || selectComponent.value.length > 1) return
 
-        return selectComponent.value.props
+        return selectComponent.value[0].props
     })
 
-    function selectStyle (item: EditComponent) {
-        const props = item.props
-
-        const res = {
-            opacity: 1,
-            zIndex: props.zIndex,
-            position: 'absolute',
-            width: `${props.width}px`,
-            height: `${props.height}px`,
-            top: `${props.top}px`,
-            left: `${props.left}px`,
-            transform: `rotate(${props.rotate}deg)`
-        }
-
-        if (selectComponentId.value !== item.id) {
-            res.opacity = 0
-        }
-
-        return res
-    }
-
     return reactive({
-        selectStyle,
         select,
         noSelect,
         selectProps,
@@ -351,7 +454,7 @@ function useCanvasPanel () {
 // 属性面板相关
 function usePropPanel () {
     const name = computed(() => {
-        return String(selectComponent.value?.name)
+        return String(selectComponent.value[0].name)
     })
 
     const showFont = computed(() => {
@@ -401,6 +504,8 @@ function useWithdrawal () {
         })
 
         function update (data: EditComponent[]) {
+            selectComponent.value = []
+
             components.value = cloneDeep(data)
 
             skipPushWithdrawal.value = true
@@ -430,7 +535,13 @@ function useDelKeydown (e: KeyboardEvent, component: UseComponent) {
     const isDel = key === 'delete'
 
     if (isDel) {
-        component.remove(selectComponent.value)
+        while (selectComponent.value.length) {
+            const v = selectComponent.value.pop()
+
+            if (v) {
+                component.remove(v)
+            }
+        }
     }
 }
 
@@ -451,17 +562,19 @@ function useArrowKeydown (e: KeyboardEvent) {
         value = 10
     }
 
-    const props = selectComponent.value.props
+    selectComponent.value.forEach(a => {
+        const props = a.props
 
-    if (isArrowUp) {
-        props.top -= value
-    } else if (isArrowDown) {
-        props.top += value
-    } else if (isArrowLeft) {
-        props.left -= value
-    } else if (isArrowRight) {
-        props.left += value
-    }
+        if (isArrowUp) {
+            props.top -= value
+        } else if (isArrowDown) {
+            props.top += value
+        } else if (isArrowLeft) {
+            props.left -= value
+        } else if (isArrowRight) {
+            props.left += value
+        }
+    })
 }
 
 function useAction (canvas: UseCanvas) {
@@ -533,7 +646,8 @@ export default defineComponent({
             inputTypeOptions,
             linkTargetOptions,
             action: useAction(canvasPanel),
-            scale: useScale()
+            scale: useScale(),
+            check: useCheck()
         }
     }
 })
