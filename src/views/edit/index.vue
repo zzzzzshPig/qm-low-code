@@ -125,6 +125,12 @@
                     </div>
                 </div>
             </div>
+
+            <img
+                src="./images/iphone.svg"
+                alt=""
+                class="bg"
+            >
         </div>
 
         <div
@@ -571,22 +577,22 @@
 <style scoped lang="less">
     .btn-save, .btn-preview, .btn-publish, .btn-prepublish {
         position: absolute;
-        top: 16px;
+        right: 288px;
 
         &.btn-save {
-            right: 288px;
+            top: 16px;
         }
 
         &.btn-preview {
-            right: 368px;
+            top: 64px;
         }
 
         &.btn-prepublish {
-            right: 448px;
+            top: 112px;
         }
 
         &.btn-publish {
-            right: 538px;
+            top: 160px;
         }
     }
 
@@ -601,16 +607,16 @@
         height: 100%;
 
         .canvas {
+            z-index: 1;
             overflow-x: hidden;
             overflow-y: auto;
             position: absolute;
-            top: 80px;
+            top: 120px;
             left: 50%;
             width: 375px;
             height: 667px;
-            border: 1px solid rgba(0, 0, 0, .1);
+            background: #fff;
             transform: translateX(-50%);
-            box-sizing: content-box;
 
             /*滚动条样式*/
             &::-webkit-scrollbar {/*滚动条整体样式*/
@@ -698,6 +704,15 @@
                     }
                 }
             }
+        }
+
+        .bg {
+            position: absolute;
+            top: 13px;
+            left: 50%;
+            width: 436px;
+            height: 881px;
+            transform: translateX(-50%);
         }
     }
 
