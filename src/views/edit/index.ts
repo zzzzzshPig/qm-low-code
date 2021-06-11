@@ -10,7 +10,7 @@ import {
     skipPushWithdrawal,
     isRestoreKeydown,
     isRevokeKeydown,
-    openWin
+    openWin, isCopyKeydown
 } from './helper'
 import { EditComponent, ImportComponent } from '@/views/edit/types'
 import { cloneDeep } from 'lodash'
@@ -21,18 +21,6 @@ import ColorPicker from './components/colorPicker/index.vue'
 import MyInput from './components/input/index.vue'
 
 const components = ref<EditComponent[]>([])
-
-const maxZIndex = computed(() => {
-    let res = -Infinity
-
-    for (const a of components.value) {
-        if (a.props.zIndex > res) {
-            res = a.props.zIndex
-        }
-    }
-
-    return res
-})
 
 const borderStyleOptions = [
     {
@@ -153,6 +141,18 @@ function useComponent () {
 
 function useDrag (component: UseComponent) {
     let dragItem: null | ImportComponent = null
+
+    const maxZIndex = computed(() => {
+        let res = -Infinity
+
+        for (const a of components.value) {
+            if (a.props.zIndex > res) {
+                res = a.props.zIndex
+            }
+        }
+
+        return res
+    })
 
     function start (item: ImportComponent) {
         dragItem = item
@@ -404,18 +404,18 @@ function useSelect (component: UseComponent, drag: UseDrag) {
                 return
             }
 
-            componentStyle.top = 0
-            componentStyle.left = 0
-            componentStyle.width = 0
-            componentStyle.height = 0
-            componentStyle.zIndex = 0
+            componentStyle.top = Infinity
+            componentStyle.left = Infinity
+            componentStyle.width = -Infinity
+            componentStyle.height = -Infinity
+            componentStyle.zIndex = -Infinity
 
             selectComponent.value.forEach(a => {
-                componentStyle.top = componentStyle.top ? Math.min(a.props.top, componentStyle.top) : a.props.top
-                componentStyle.left = componentStyle.left ? Math.min(a.props.left, componentStyle.left) : a.props.left
-                componentStyle.width = componentStyle.width ? Math.max(a.props.left + a.props.width, componentStyle.width) : a.props.left + a.props.width
-                componentStyle.height = componentStyle.height ? Math.max(a.props.top + a.props.height, componentStyle.height) : a.props.top + a.props.height
-                componentStyle.zIndex = componentStyle.zIndex ? Math.max(a.props.zIndex, componentStyle.zIndex) : a.props.zIndex
+                componentStyle.top = Math.min(a.props.top, componentStyle.top)
+                componentStyle.left = Math.min(a.props.left, componentStyle.left)
+                componentStyle.width = Math.max(a.props.left + a.props.width, componentStyle.width)
+                componentStyle.height = Math.max(a.props.top + a.props.height, componentStyle.height)
+                componentStyle.zIndex = Math.max(a.props.zIndex, componentStyle.zIndex)
             })
 
             return {
@@ -532,10 +532,6 @@ function useSaveKeydown (e: KeyboardEvent, canvas: UseCanvas) {
 }
 
 function useDelKeydown (e: KeyboardEvent, component: UseComponent) {
-    if (!selectComponent.value) {
-        return
-    }
-
     const key = e.key.toLowerCase()
     const isDel = key === 'delete'
 
@@ -551,10 +547,6 @@ function useDelKeydown (e: KeyboardEvent, component: UseComponent) {
 }
 
 function useArrowKeydown (e: KeyboardEvent) {
-    if (!selectComponent.value) {
-        return
-    }
-
     const key = e.key.toLowerCase()
     const isArrowUp = key === 'arrowup'
     const isArrowDown = key === 'arrowdown'
@@ -580,6 +572,13 @@ function useArrowKeydown (e: KeyboardEvent) {
             props.left += value
         }
     })
+}
+
+let copyComponent = ''
+function useCopyPasteKeydown (e: KeyboardEvent) {
+    if (isCopyKeydown(e)) {
+        copyComponent = JSON.stringify(selectComponent.value)
+    }
 }
 
 function useAction (canvas: UseCanvas) {
@@ -633,12 +632,11 @@ export default defineComponent({
 
         useWithdrawal()
 
-        registerWindowKeyDown(useArrowKeydown)
-        registerWindowKeyDown((e) => {
-            useSaveKeydown(e, canvasPanel)
-        })
-        registerWindowKeyDown((e) => {
+        registerWindowKeyDown(e => {
             useDelKeydown(e, component)
+            useSaveKeydown(e, canvasPanel)
+            useArrowKeydown(e)
+            useCopyPasteKeydown(e)
         })
 
         return {

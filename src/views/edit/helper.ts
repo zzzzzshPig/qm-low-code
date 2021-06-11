@@ -86,23 +86,39 @@ export function registerWindowKeyDown (cb: (e: KeyboardEvent, ...arg: never[]) =
 
 const isMacOs = navigator.platform.toLowerCase().includes('mac')
 
+function getMetaKey (e: KeyboardEvent) {
+    return isMacOs ? e.metaKey : e.ctrlKey
+}
+
 export function isSaveKeydown (e: KeyboardEvent) {
     const key = e.key.toLowerCase()
-    const handler = isMacOs ? e.metaKey : e.ctrlKey
+    const handler = getMetaKey(e)
 
     return handler && key === 's'
 }
 
 export function isRevokeKeydown (e: KeyboardEvent) {
-    const handler = isMacOs ? e.metaKey : e.ctrlKey
+    const handler = getMetaKey(e)
 
     return handler && e.key.toLowerCase() === 'z'
 }
 
 export function isRestoreKeydown (e: KeyboardEvent) {
-    const handler = isMacOs ? e.metaKey : e.ctrlKey
+    const handler = getMetaKey(e)
 
     return handler && e.key.toLowerCase() === 'z' && e.shiftKey
+}
+
+export function isCopyKeydown (e: KeyboardEvent) {
+    const handler = getMetaKey(e)
+
+    return handler && e.key.toLowerCase() === 'c'
+}
+
+export function isPasteKeydown (e: KeyboardEvent) {
+    const handler = getMetaKey(e)
+
+    return handler && e.key.toLowerCase() === 'v'
 }
 
 export function initProps (component: ImportComponent) {

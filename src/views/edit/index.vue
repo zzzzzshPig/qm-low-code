@@ -57,6 +57,8 @@
             class="canvas-box"
             @click="select.noSelect"
             @mousedown="select.drawCheckBox"
+            @drop="drag.end"
+            @dragover.prevent
         >
             <img
                 src="./images/iphone.svg"
@@ -66,13 +68,11 @@
 
             <div
                 class="canvas"
-                @drop="drag.end"
-                @dragover.prevent
             >
                 <div
                     v-for="item in components"
                     :key="item.id"
-                    @mousedown.stop="select.select($event, item)"
+                    @mousedown="select.select($event, item)"
                 >
                     <component
                         :is="item.name"
@@ -580,7 +580,7 @@
                 </div>
             </div>
         </div>
-    </div>`
+    </div>
 </template>
 
 <style scoped lang="less">
