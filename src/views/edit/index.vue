@@ -56,8 +56,14 @@
         <div
             class="canvas-box"
             @click="select.noSelect"
-            @mousedown="check.mousedown"
+            @mousedown="select.drawCheckBox"
         >
+            <img
+                src="./images/iphone.svg"
+                alt=""
+                class="bg"
+            >
+
             <div
                 class="canvas"
                 @drop="drag.end"
@@ -75,19 +81,13 @@
                 </div>
             </div>
 
-            <img
-                src="./images/iphone.svg"
-                alt=""
-                class="bg"
-            >
-
             <div
-                :style="check.style"
+                :style="select.checkBoxStyle"
                 class="check-box"
             />
 
             <div
-                :style="check.boxStyle"
+                :style="select.boxStyle"
                 :class="{
                     'component-check-box': select.selectComponent.length > 1,
                     'component-select-box': select.selectComponent.length === 1
@@ -580,7 +580,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>`
 </template>
 
 <style scoped lang="less">
@@ -627,7 +627,7 @@
         }
 
         .canvas {
-            z-index: 1;
+            z-index: auto;
             overflow-x: hidden;
             overflow-y: auto;
             position: absolute;
@@ -636,7 +636,7 @@
             width: 375px;
             height: 667px;
             background: #fff;
-            transform: translateX(-50%);
+            margin-left: -187.5px;
 
             /*滚动条样式*/
             &::-webkit-scrollbar {/*滚动条整体样式*/
@@ -668,7 +668,6 @@
         }
 
         .component-check-box, .component-select-box {
-            z-index: 999999999999999999999;
             position: absolute;
             border: 1px dashed #808080;
             cursor: move;

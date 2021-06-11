@@ -151,107 +151,6 @@ function useComponent () {
     }
 }
 
-function useCheck () {
-    const style = reactive({
-        width: 0,
-        height: 0,
-        top: 0,
-        left: 0
-    })
-
-    const componentStyle = reactive({
-        width: 0,
-        height: 0,
-        top: 0,
-        left: 0
-    })
-
-    function mousedown (e: MouseEvent) {
-        const sX = e.pageX
-        const sY = e.pageY
-        const sTop = sY
-        const sLeft = sX
-        const { boundClientRect } = getCanvasDom()
-
-        function mousemove (e: MouseEvent) {
-            if (!boundClientRect) {
-                return
-            }
-
-            style.top = e.clientY - sY > 0 ? sTop : sTop + e.clientY - sY
-            style.left = e.clientX - sX > 0 ? sLeft : sLeft + e.clientX - sX
-            style.width = Math.abs(sX - e.clientX)
-            style.height = Math.abs(sY - e.clientY)
-
-            selectComponent.value = components.value.filter(a => {
-                let { left, top, width, height } = a.props
-                left += boundClientRect.x
-                top += boundClientRect.y
-
-                // 右侧大于左侧 左侧小于右侧 顶部小于底部 底部大于顶部
-                if ((style.left + style.width) > left && style.left < (left + width) && style.top < (top + height) && (style.top + style.height) > top) {
-                    return a
-                }
-            })
-
-            notNoSelect = true
-        }
-
-        function mouseup () {
-            style.width = 0
-            style.height = 0
-            style.top = 0
-            style.left = 0
-
-            document.removeEventListener('mouseup', mouseup)
-            document.removeEventListener('mousemove', mousemove)
-        }
-
-        document.addEventListener('mousemove', mousemove)
-        document.addEventListener('mouseup', mouseup)
-    }
-
-    return reactive({
-        mousedown,
-
-        style: computed(() => {
-            return {
-                width: style.width + 'px',
-                height: style.height + 'px',
-                top: style.top + 'px',
-                left: style.left + 'px'
-            }
-        }),
-
-        boxStyle: computed(() => {
-            const { boundClientRect } = getCanvasDom()
-
-            if (!selectComponent.value || !boundClientRect) {
-                return
-            }
-
-            componentStyle.top = 0
-            componentStyle.left = 0
-            componentStyle.width = 0
-            componentStyle.height = 0
-
-            selectComponent.value.forEach(a => {
-                componentStyle.top = componentStyle.top ? Math.min(a.props.top, componentStyle.top) : a.props.top
-                componentStyle.left = componentStyle.left ? Math.min(a.props.left, componentStyle.left) : a.props.left
-                componentStyle.width = componentStyle.width ? Math.max(a.props.left + a.props.width, componentStyle.width) : a.props.left + a.props.width
-                componentStyle.height = componentStyle.height ? Math.max(a.props.top + a.props.height, componentStyle.height) : a.props.top + a.props.height
-            })
-
-            return {
-                top: componentStyle.top + boundClientRect.top + 'px',
-                left: componentStyle.left + boundClientRect.left + 'px',
-                width: componentStyle.width - componentStyle.left + 'px',
-                height: componentStyle.height - componentStyle.top + 'px'
-            }
-        })
-    })
-}
-
 function useDrag (component: UseComponent) {
     let dragItem: null | ImportComponent = null
 
@@ -286,6 +185,10 @@ function useDrag (component: UseComponent) {
     let delayTime = 0
 
     function moveStart (e: MouseEvent) {
+        if (e.button !== 0) {
+            return
+        }
+
         initTop = e.clientY
         initLeft = e.clientX
         delayTime = Date.now()
@@ -411,6 +314,70 @@ function useSelect (component: UseComponent, drag: UseDrag) {
         return selectComponent.value[0].props
     })
 
+    const checkBoxStyle = reactive({
+        width: 0,
+        height: 0,
+        top: 0,
+        left: 0
+    })
+
+    const componentStyle = reactive({
+        width: 0,
+        height: 0,
+        top: 0,
+        left: 0,
+        zIndex: 0
+    })
+
+    function drawCheckBox (e: MouseEvent) {
+        if (e.button !== 0) {
+            return
+        }
+
+        const sX = e.pageX
+        const sY = e.pageY
+        const sTop = sY
+        const sLeft = sX
+        const { boundClientRect } = getCanvasDom()
+
+        function mousemove (e: MouseEvent) {
+            if (!boundClientRect) {
+                return
+            }
+
+            checkBoxStyle.top = e.clientY - sY > 0 ? sTop : sTop + e.clientY - sY
+            checkBoxStyle.left = e.clientX - sX > 0 ? sLeft : sLeft + e.clientX - sX
+            checkBoxStyle.width = Math.abs(sX - e.clientX)
+            checkBoxStyle.height = Math.abs(sY - e.clientY)
+
+            selectComponent.value = components.value.filter(a => {
+                let { left, top, width, height } = a.props
+                left += boundClientRect.x
+                top += boundClientRect.y
+
+                // 右侧大于左侧 左侧小于右侧 顶部小于底部 底部大于顶部
+                if ((checkBoxStyle.left + checkBoxStyle.width) > left && checkBoxStyle.left < (left + width) && checkBoxStyle.top < (top + height) && (checkBoxStyle.top + checkBoxStyle.height) > top) {
+                    return a
+                }
+            })
+
+            notNoSelect = true
+        }
+
+        function mouseup () {
+            checkBoxStyle.width = 0
+            checkBoxStyle.height = 0
+            checkBoxStyle.top = 0
+            checkBoxStyle.left = 0
+
+            document.removeEventListener('mouseup', mouseup)
+            document.removeEventListener('mousemove', mousemove)
+        }
+
+        document.addEventListener('mousemove', mousemove)
+        document.addEventListener('mouseup', mouseup)
+    }
+
     return reactive({
         select,
         noSelect,
@@ -420,7 +387,45 @@ function useSelect (component: UseComponent, drag: UseDrag) {
             if (isRestoreKeydown(e) || isRevokeKeydown(e)) {
                 skipPushWithdrawal.value = true
             }
-        }
+        },
+        drawCheckBox,
+        checkBoxStyle: computed(() => {
+            return {
+                width: checkBoxStyle.width + 'px',
+                height: checkBoxStyle.height + 'px',
+                top: checkBoxStyle.top + 'px',
+                left: checkBoxStyle.left + 'px'
+            }
+        }),
+        boxStyle: computed(() => {
+            const { boundClientRect } = getCanvasDom()
+
+            if (!selectComponent.value || !boundClientRect) {
+                return
+            }
+
+            componentStyle.top = 0
+            componentStyle.left = 0
+            componentStyle.width = 0
+            componentStyle.height = 0
+            componentStyle.zIndex = 0
+
+            selectComponent.value.forEach(a => {
+                componentStyle.top = componentStyle.top ? Math.min(a.props.top, componentStyle.top) : a.props.top
+                componentStyle.left = componentStyle.left ? Math.min(a.props.left, componentStyle.left) : a.props.left
+                componentStyle.width = componentStyle.width ? Math.max(a.props.left + a.props.width, componentStyle.width) : a.props.left + a.props.width
+                componentStyle.height = componentStyle.height ? Math.max(a.props.top + a.props.height, componentStyle.height) : a.props.top + a.props.height
+                componentStyle.zIndex = componentStyle.zIndex ? Math.max(a.props.zIndex, componentStyle.zIndex) : a.props.zIndex
+            })
+
+            return {
+                zIndex: componentStyle.zIndex,
+                top: componentStyle.top + boundClientRect.top + 'px',
+                left: componentStyle.left + boundClientRect.left + 'px',
+                width: componentStyle.width - componentStyle.left + 'px',
+                height: componentStyle.height - componentStyle.top + 'px'
+            }
+        })
     })
 }
 
@@ -646,8 +651,7 @@ export default defineComponent({
             inputTypeOptions,
             linkTargetOptions,
             action: useAction(canvasPanel),
-            scale: useScale(),
-            check: useCheck()
+            scale: useScale()
         }
     }
 })
