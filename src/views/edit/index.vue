@@ -72,7 +72,7 @@
                 <div
                     v-for="item in components"
                     :key="item.id"
-                    @mousedown="select.select($event, item)"
+                    @mousedown.stop="select.select($event, item)"
                 >
                     <component
                         :is="item.name"

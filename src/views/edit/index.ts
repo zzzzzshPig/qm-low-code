@@ -10,7 +10,7 @@ import {
     skipPushWithdrawal,
     isRestoreKeydown,
     isRevokeKeydown,
-    openWin, isCopyKeydown
+    openWin, isCopyKeydown, isPasteKeydown
 } from './helper'
 import { EditComponent, ImportComponent } from '@/views/edit/types'
 import { cloneDeep } from 'lodash'
@@ -134,8 +134,10 @@ function useComponent () {
     }
 
     return {
+        uid,
         add,
-        remove
+        remove,
+        insert
     }
 }
 
@@ -574,10 +576,30 @@ function useArrowKeydown (e: KeyboardEvent) {
     })
 }
 
-let copyComponent = ''
-function useCopyPasteKeydown (e: KeyboardEvent) {
+let copyComponent = '[]'
+function useCopyPasteKeydown (e: KeyboardEvent, component: UseComponent) {
     if (isCopyKeydown(e)) {
+        if (!selectComponent.value.length) {
+            return
+        }
+
         copyComponent = JSON.stringify(selectComponent.value)
+    }
+
+    if (isPasteKeydown(e)) {
+        const components = JSON.parse(copyComponent) as EditComponent[]
+        const fComponents: EditComponent[] = []
+
+        components.forEach(a => {
+            const com = {
+                ...a,
+                id: component.uid.value
+            }
+            fComponents.push(com)
+            component.insert(com)
+        })
+
+        selectComponent.value = fComponents
     }
 }
 
@@ -636,7 +658,7 @@ export default defineComponent({
             useDelKeydown(e, component)
             useSaveKeydown(e, canvasPanel)
             useArrowKeydown(e)
-            useCopyPasteKeydown(e)
+            useCopyPasteKeydown(e, component)
         })
 
         return {
